@@ -83,4 +83,8 @@ Los AP pueden ser: `satélites (Agent)` o `AP cableados (Wired AP)`.
 
 ## Despliegue del controlador en modo “bypass” (no como gateway)
 
+<<<<<<< HEAD
    Si el controlador no actúa como puerta de enlace ni proporciona DHCP, deberás configurar manualmente la red: asignar IP LAN, puerta de enlace y DNS al controlador. Por defecto, el puerto LAN del controlador será cliente DHCP y obtendrá IP de un gateway externo. Si prefieres IP estática, asegúrate de que el controlador y el gateway estén en la misma subred y puedan comunicarse entre sí. Si no es así, no será posible sincronizar la configuración entre el controlador y los AP.
+=======
+   Si el controlador no actúa como puerta de enlace ni proporciona DHCP, deberás configurar manualmente la red: asignar IP LAN, puerta de enlace y DNS al controlador. Por defecto, el puerto LAN del controlador será cliente DHCP y obtendrá IP de un gateway externo. Si prefieres IP estática, asegúrate de que el controlador y el gateway estén en la misma subred y puedan comunicarse entre sí. Si no es así, no será posible sincronizar la configuración entre el controlador y los AP.
+>>>>>>> 37d7692f (Primer commit: estructura completa de apps y parches)
