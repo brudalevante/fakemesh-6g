@@ -27,8 +27,8 @@ http://1122334455AB.ap.fakemesh/
 Si un AP pierde la conexión durante unos 3 minutos, entra en modo de fallo. En este modo, se habilita un SSID por defecto, permitiendo que te conectes para reconfigurarlo.
 El SSID y contraseña por defecto en modo de fallo son:
 ```
-SSID: X-WRT_XXXX
-CONTRASEÑA: 88888888
+SSID: mesh-brudalevante
+CONTRASEÑA: 12345678
 ```
 
 La IP de gestión del AP en modo de fallo será la puerta de enlace DHCP. Por ejemplo, si tu ordenador obtiene una IP `192.168.16.x`, la IP de gestión del AP será `192.168.16.1`.
@@ -57,7 +57,7 @@ Los AP pueden ser: `satélites (Agent)` o `AP cableados (Wired AP)`.
 
 ### 3. Banda (Band)
 
-   Es la banda inalámbrica utilizada (2G o 5G). Todos los nodos deben estar configurados en la misma banda.
+   Es la banda inalámbrica utilizada (2G, 5G o 6G). Todos los nodos deben estar configurados en la misma banda.
 
 ### 4. Rol (Role)
 
@@ -83,8 +83,93 @@ Los AP pueden ser: `satélites (Agent)` o `AP cableados (Wired AP)`.
 
 ## Despliegue del controlador en modo “bypass” (no como gateway)
 
-<<<<<<< HEAD
    Si el controlador no actúa como puerta de enlace ni proporciona DHCP, deberás configurar manualmente la red: asignar IP LAN, puerta de enlace y DNS al controlador. Por defecto, el puerto LAN del controlador será cliente DHCP y obtendrá IP de un gateway externo. Si prefieres IP estática, asegúrate de que el controlador y el gateway estén en la misma subred y puedan comunicarse entre sí. Si no es así, no será posible sincronizar la configuración entre el controlador y los AP.
-=======
-   Si el controlador no actúa como puerta de enlace ni proporciona DHCP, deberás configurar manualmente la red: asignar IP LAN, puerta de enlace y DNS al controlador. Por defecto, el puerto LAN del controlador será cliente DHCP y obtendrá IP de un gateway externo. Si prefieres IP estática, asegúrate de que el controlador y el gateway estén en la misma subred y puedan comunicarse entre sí. Si no es así, no será posible sincronizar la configuración entre el controlador y los AP.
->>>>>>> 37d7692f (Primer commit: estructura completa de apps y parches)
+
+---
+
+## fakemesh introduction (English)
+
+fakemesh is a network topology structure consisting of a `controller (AC)`, one or more `wired APs (Wired AP)`, and `satellites (Agent)`. It is a hybrid network that combines `wireless Mesh` and `AC+AP` modes. In this architecture, the wired APs connect to the controller (AC) via Ethernet cable, while the satellites (Agent) connect wirelessly as STA clients, jointly forming a wireless coverage network (which may also include wired connections).
+
+Deploying fakemesh is simple: just connect the node devices to the appropriate network and configure their role, Mesh ID, and other parameters. Since fakemesh combines wireless Mesh and AC+AP modes, it is easy to create a hybrid network, improving coverage and reliability.
+
+Currently, [X-WRT](https://github.com/x-wrt/x-wrt) integrates fakemesh by default.
+
+## Using fakemesh
+
+### After successful configuration, the device access addresses are:
+
+Controller access: `http://controller.fakemesh/` or `http://ac.fakemesh/`
+
+AP access: `http://{mac}.ap.fakemesh/` or `http://N.ap.fakemesh/`
+
+Where `{mac}` is the AP’s MAC address (e.g., `{mac}=1122334455AB`), and `N` is an automatically assigned number to the AP (N=1, N=2, N=3, ...).
+
+Example:
+```
+http://1.ap.fakemesh/
+http://1122334455AB.ap.fakemesh/
+```
+
+### Troubleshooting
+
+If an AP loses connection for about 3 minutes, it enters failure mode. In this mode, a default SSID is enabled so you can connect for reconfiguration.
+Default SSID and password in failure mode:
+```
+SSID: mesh-brudalevante
+PASSWORD: 12345678
+```
+
+The AP's management IP in failure mode will be the DHCP gateway. For example, if your computer gets IP `192.168.16.x`, the AP's management IP will be `192.168.16.1`.
+
+## fakemesh basic components
+
+The network includes a `controller` and one or more `APs`.
+
+APs can be: `satellites (Agent)` or `wired APs (Wired AP)`.
+
+**Controller:** Acts as AC and main router, providing Internet access and centralized management of satellites and wired APs, as well as wireless configuration.
+
+**Satellite (Agent):** AP that connects to the network via Wi-Fi.
+
+**Wired AP:** AP that connects to the network via Ethernet cable.
+
+## fakemesh configuration parameters
+
+### 1. Mesh ID
+
+   This parameter is the common ID of the fakemesh network; it must be the same on the controller, satellites, and wired APs.
+
+### 2. Key
+
+   This is the shared network key. It is used for encryption; you can leave it blank if you do not want encryption.
+
+### 3. Band
+
+   The wireless band used (2G, 5G or 6G). All nodes must be configured on the same band.
+
+### 4. Role
+
+   Can be controller, satellite, or wired AP.
+
+### 5. Sync Config
+
+   Indicates if Wi-Fi configuration is centrally managed from the controller.
+
+### 6. Access IP address
+
+   Allows you to assign a specific IP to the controller for management interface access.
+
+### 7. Fronthaul Disabled
+   If enabled, this node will not allow other APs to connect via its Wi-Fi.
+
+### 8. Band Steer Helper
+   You can choose [DAWN](https://github.com/fakemesh/dawn) or [usteer](https://github.com/fakemesh/usteer) as roaming helpers.
+
+## Wireless management
+
+   From the controller’s interface you can manage the entire wireless network: add or remove SSIDs, set encryption and bandwidth, etc.
+
+## Controller deployment in “bypass” mode (not as gateway)
+
+   If the controller does not act as a gateway or provide DHCP, you must manually configure the network: assign LAN IP, gateway, and DNS to the controller. By default, the controller’s LAN port will be a DHCP client and obtain an IP from an external gateway. If you prefer a static IP, make sure the controller and gateway are on the same subnet and can communicate with each other. Otherwise, it will not be possible to synchronize configuration between the controller and APs.
