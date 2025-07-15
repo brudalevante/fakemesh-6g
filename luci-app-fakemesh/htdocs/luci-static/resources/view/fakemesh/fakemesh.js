@@ -42,8 +42,8 @@ return view.extend({
 		o = s.option(form.ListValue, 'band', _('Band'));
 		o.value('2g', _('2G'));
 		o.value('5g', _('5G'));
-		o.value('6g', _('6G'));  // <-- Añadido
-		o.default = '5g';
+		o.value('6g', _('6G'));
+		o.default = '6g'; // <-- Banda 6G por defecto
 
 		o = s.option(form.ListValue, 'role', _('Role'), _('Set the gateway router as controller, others as agent.'));
 		o.value('wap', _('Wired AP (ethernet as backhaul)'));
@@ -117,8 +117,8 @@ return view.extend({
 		o.value('2g5g', _('2G+5G'));
 		o.value('5g', _('5G'));
 		o.value('2g', _('2G'));
-		o.value('6g', _('6G'));  // <-- Añadido
-		o.default = '2g5g';
+		o.value('6g', _('6G'));
+		o.default = '6g'; // <-- Banda 6G por defecto en Wireless Management
 		if (current_role != 'controller') o.readonly = true;
 
 		o = s.option(form.Flag, 'enabled', _('Enable'));
