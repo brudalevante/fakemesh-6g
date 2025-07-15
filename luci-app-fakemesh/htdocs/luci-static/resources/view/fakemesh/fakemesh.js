@@ -40,8 +40,9 @@ return view.extend({
 		o.datatype = 'wpakey';
 
 		o = s.option(form.ListValue, 'band', _('Band'));
-		o.value('5g', _('5G'));
 		o.value('2g', _('2G'));
+		o.value('5g', _('5G'));
+		o.value('6g', _('6G'));  // <-- Añadido
 		o.default = '5g';
 
 		o = s.option(form.ListValue, 'role', _('Role'), _('Set the gateway router as controller, others as agent.'));
@@ -116,6 +117,7 @@ return view.extend({
 		o.value('2g5g', _('2G+5G'));
 		o.value('5g', _('5G'));
 		o.value('2g', _('2G'));
+		o.value('6g', _('6G'));  // <-- Añadido
 		o.default = '2g5g';
 		if (current_role != 'controller') o.readonly = true;
 
