@@ -149,9 +149,9 @@ var HearingMap = form.DummyValue.extend({
         let connectedClients = {};
         for (let network in dawnNetworkData) {
             connectedClients[network] = [];
-            let aps = Object.entries(dawnNetworkData[network]).map(function (ap) {
-                accessPointsHintsData[ap[0]] = { name: ap[1].hostname };
-                let clientData = Object.entries(ap[1]);
+            Object.entries(dawnNetworkData[network]).forEach(function ([mac, ap]) {
+                accessPointsHintsData[mac] = { name: ap.hostname };
+                let clientData = Object.entries(ap);
                 for (let i = 0; i < clientData.length; i++) {
                     if (typeof clientData[i][1] === 'object') {
                         connectedClients[network].push(clientData[i][0]);
