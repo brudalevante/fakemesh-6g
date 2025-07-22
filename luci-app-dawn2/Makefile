@@ -21,7 +21,7 @@ define Package/luci-app-dawn2
 	SUBMENU:=Configuration Fake Mesh Support
 	TITLE:=LuCI Support for dawn2
 	PKGARCH:=all
-	DEPENDS:=+jsonfilter +umdns +firewall4
+	DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
 endef
 
 define Package/luci-app-dawn2/description
