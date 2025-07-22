@@ -1,9 +1,6 @@
-#
 # Copyright (C) 2024 brudalevante
-#
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
-#
 
 include $(TOPDIR)/rules.mk
 
@@ -31,9 +28,10 @@ define Package/luci-app-usteer2/description
 	LuCI Support for usteer2.
 endef
 
+# Compila todos los .po de po/*/*.po a .lmo en el build dir
 define Build/Prepare
-	$(foreach po,$(wildcard ${CURDIR}/files/luci/i18n/*.po), \
-		po2lmo $(po) $(PKG_BUILD_DIR)/$(patsubst %.po,%.lmo,$(notdir $(po)));)
+	$(foreach po,$(wildcard ${CURDIR}/po/*/*.po), \
+		po2lmo $(po) $(PKG_BUILD_DIR)/$(notdir $(patsubst %.po,%.lmo,$(po)));)
 endef
 
 define Build/Configure
@@ -42,48 +40,15 @@ endef
 define Build/Compile
 endef
 
-define Package/luci-app-usteer2/conffiles
-/etc/config/usteer2
-endef
-
-define Package/luci-app-usteer2/postinst
-#!/bin/sh
-if [ -z "$$IPKG_INSTROOT" ]; then
-  ( . /etc/uci-defaults/40_luci-app-usteer2 )
-  rm -f /etc/uci-defaults/40_luci-app-usteer2
-  ( . /etc/uci-defaults/96-usteer2-defaults )
-  rm -f /etc/uci-defaults/96-usteer2-defaults
-
-  rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
-fi
-
-exit 0
-endef
-
 define Package/luci-app-usteer2/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/usteer2.*.lmo $(1)/usr/lib/lua/luci/i18n/
-	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_DATA) ./root/etc/config/usteer2 $(1)/etc/config/usteer2
-	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./root/etc/init.d/usteer2 $(1)/etc/init.d/usteer2
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) ./root/usr/sbin/usteer2 $(1)/usr/sbin/usteer2
-	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_DATA) ./root/etc/uci-defaults/40_luci-app-usteer2 $(1)/etc/uci-defaults/40_luci-app-usteer2
-	$(INSTALL_DATA) ./root/etc/uci-defaults/96-usteer2-defaults $(1)/etc/uci-defaults/96-usteer2-defaults
-	$(INSTALL_DIR) $(1)/etc/hotplug.d/dhcp/
-	$(INSTALL_DATA) ./root/etc/hotplug.d/dhcp/10-usteer2 $(1)/etc/hotplug.d/dhcp/10-usteer2
-	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface/
-	$(INSTALL_DATA) ./root/etc/hotplug.d/iface/19-usteer2 $(1)/etc/hotplug.d/iface/19-usteer2
-	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/*.json $(1)/usr/share/rpcd/acl.d/
+	-$(INSTALL_DATA) $(PKG_BUILD_DIR)/usteer2.*.lmo $(1)/usr/lib/lua/luci/i18n/
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	$(INSTALL_DATA) ./root/usr/share/luci/menu.d/*.json $(1)/usr/share/luci/menu.d/
+	$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-usteer2.json $(1)/usr/share/luci/menu.d/luci-app-usteer2.json
+	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
+	-$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-usteer2.json $(1)/usr/share/rpcd/acl.d/luci-app-usteer2.json
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/usteer2
-	$(INSTALL_DATA) ./htdocs/luci-static/resources/view/usteer2/usteer2.js $(1)/www/luci-static/resources/view/usteer2/usteer2.js
-	$(INSTALL_DIR) $(1)/usr/share/ucitrack
-	$(INSTALL_DATA) ./root/usr/share/ucitrack/*.json $(1)/usr/share/ucitrack/
+	$(INSTALL_DATA) ./www/luci-static/resources/view/usteer2/usteer2.js $(1)/www/luci-static/resources/view/usteer2/usteer2.js
 endef
 
 $(eval $(call BuildPackage,luci-app-usteer2))
