@@ -47,8 +47,8 @@ define Package/luci-app-dawn2/install
 	$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	-$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
-	$(INSTALL_DIR) $(1)/www/luci-static/resources
-	-$(INSTALL_DATA) ./www/luci-static/resources/dawn2-common.js $(1)/www/luci-static/resources/dawn2-common.js
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
+	-$(INSTALL_DATA) ./www/luci-static/resources/dawn/dawn2-common.js $(1)/www/luci-static/resources/dawn/dawn2-common.js
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
 	$(INSTALL_DATA) ./www/luci-static/resources/view/dawn2/dawn2.js $(1)/www/luci-static/resources/view/dawn2/dawn2.js
 endef
