@@ -40,8 +40,11 @@ define Build/Compile
 	@echo "DEBUG: Listando archivos .po en $(PKG_BUILD_DIR)/po/*/*.po"
 	@ls -l $(PKG_BUILD_DIR)/po/*/*.po || true
 	@for po in $(wildcard $(PKG_BUILD_DIR)/po/*/*.po); do \
-		echo "DEBUG: Ejecutando po2lmo para $$po"; \
-		po2lmo "$$po" "$(PKG_BUILD_DIR)/$$(basename $${po%.po}.lmo)"; \
+		lang=$$(basename $$(dirname $$po)); \
+		base=$$(basename $${po%.po}); \
+		dest="$(PKG_BUILD_DIR)/$$base.$$lang.lmo"; \
+		echo "DEBUG: Ejecutando po2lmo para $$po → $$dest"; \
+		po2lmo "$$po" "$$dest"; \
 	done
 	@echo "DEBUG: Listando archivos .lmo generados:"
 	@ls -l $(PKG_BUILD_DIR)/*.lmo || true
