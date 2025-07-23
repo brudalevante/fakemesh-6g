@@ -28,21 +28,20 @@ define Package/luci-app-dawn2/description
 	LuCI Support for dawn2.
 endef
 
-# Opcional: compila traducciones si algún día tienes archivos .po
 define Build/Prepare
-	$(foreach po,$(wildcard ${CURDIR}/po/*/*.po), \
-		po2lmo $(po) $(PKG_BUILD_DIR)/$(notdir $(patsubst %.po,%.lmo,$(po)));)
-endef
-
-define Build/Configure
+	$(call Build/Prepare/Default)
+	-mkdir -p $(PKG_BUILD_DIR)/po
+	-cp -r $(CURDIR)/po/* $(PKG_BUILD_DIR)/po/ 2>/dev/null || true
 endef
 
 define Build/Compile
+	$(foreach po,$(wildcard $(PKG_BUILD_DIR)/po/*/*.po), \
+		po2lmo $(po) $(PKG_BUILD_DIR)/$(notdir $(patsubst %.po,%.lmo,$(po)));)
 endef
 
 define Package/luci-app-dawn2/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	-$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.*.lmo $(1)/usr/lib/lua/luci/i18n/
+	-$(INSTALL_DATA) $(PKG_BUILD_DIR)/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
