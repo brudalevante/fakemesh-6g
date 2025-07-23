@@ -3,7 +3,31 @@
 'require rpc';
 
 let callDawnGetNetwork, callDawnGetHearingMap, callHostHints;
-callDawnGetNetwork = rpc.declare({object: 'dawn', method: 'get_network', expect: []});
+
+callDawnGetNetwork = rpc.declare({
+    object: 'dawn',
+    method: 'get_network',
+    expect: []
+});
+
+callDawnGetHearingMap = rpc.declare({
+    object: 'dawn',
+    method: 'get_hearing_map',
+    expect: []
+});
+
+callHostHints = rpc.declare({
+    object: 'luci',
+    method: 'getHostHints',
+    expect: {}
+});
+
+function isDawnRPCAvailable() {
+    // Comprueba si DAWN responde, si no, devuelve false
+    return L.resolveDefault(callDawnGetNetwork(), null).then(function(res) {
+        return res !== null;
+    });
+}
 
 function getAvailableText(available) { return available ? _('Available') : _('Not available'); }
 function getYesText(yes) { return yes ? _('Yes') : _('No'); }
