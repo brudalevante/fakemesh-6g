@@ -40,10 +40,10 @@ return view.extend({
 		o.datatype = 'wpakey';
 
 		o = s.option(form.ListValue, 'band', _('Band'));
-		o.value('6g', _('6G'));
-		o.value('5g', _('5G'));
 		o.value('2g', _('2G'));
-		o.default = '5g';
+		o.value('5g', _('5G'));
+		o.value('6g', _('6G'));
+		o.default = '6g'; // <-- Banda 6G por defecto
 
 		o = s.option(form.ListValue, 'role', _('Role'), _('Set the gateway router as controller, others as agent.'));
 		o.value('wap', _('Wired AP (ethernet as backhaul)'));
@@ -63,9 +63,12 @@ return view.extend({
 		o.default = o.enabled;
 
 		o = s.option(form.ListValue, 'band_steer_helper', _('Band Steer Helper'));
+		o.value('none', _('None'));
 		o.value('usteer', _('usteer'));
 		o.value('dawn', _('DAWN'));
-		o.default = 'usteer';
+		o.value('usteer2', _('usteer2'));
+		o.value('dwan2', _('DWAN2'));
+		o.default = 'none';
 
 		o = s.option(form.Flag, 'fronthaul_disabled', _('Fronthaul Disabled'), _('Disable fronthaul Wi-Fi signal on this node.'));
 		o.enabled = '1';
@@ -114,10 +117,10 @@ return view.extend({
 
 		o = s.option(form.ListValue, 'band', _('Band'));
 		o.value('2g5g', _('2G+5G'));
-		o.value('6g', _('6G'));
 		o.value('5g', _('5G'));
 		o.value('2g', _('2G'));
-		o.default = '2g5g';
+		o.value('6g', _('6G'));
+		o.default = '6g'; // <-- Banda 6G por defecto en Wireless Management
 		if (current_role != 'controller') o.readonly = true;
 
 		o = s.option(form.Flag, 'enabled', _('Enable'));
