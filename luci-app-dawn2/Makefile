@@ -18,8 +18,9 @@ PKG_BUILD_DEPENDS:=luci-base/host
 
 include $(INCLUDE_DIR)/package.mk
 
+# ==== AJUSTA AQUÍ EL MENU ====
 define Package/luci-app-dawn2
-	CATEGORY:=X
+	CATEGORY:=Mesh
 	SUBMENU:=Configuration Fake Mesh Support
 	TITLE:=LuCI Support for dawn2
 	PKGARCH:=all
@@ -32,8 +33,8 @@ endef
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
-	-mkdir -p $(PKG_BUILD_DIR)/po
-	-cp -r $(CURDIR)/po/* $(PKG_BUILD_DIR)/po/ 2>/dev/null || true
+	mkdir -p $(PKG_BUILD_DIR)/po
+	cp -r $(CURDIR)/po/* $(PKG_BUILD_DIR)/po/
 endef
 
 define Build/Compile
@@ -48,16 +49,16 @@ endef
 
 define Package/luci-app-dawn2/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	-$(INSTALL_DATA) $(PKG_BUILD_DIR)/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/*.lmo $(1)/usr/lib/lua/luci/i18n/
 
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
 
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	-$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
+	$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
 
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
-	-$(INSTALL_DATA) ./www/luci-static/resources/dawn/dawn2-common.js $(1)/www/luci-static/resources/dawn/dawn2-common.js
+	$(INSTALL_DATA) ./www/luci-static/resources/dawn/dawn2-common.js $(1)/www/luci-static/resources/dawn/dawn2-common.js
 
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
 	$(INSTALL_DATA) ./www/luci-static/resources/view/dawn2/dawn2.js $(1)/www/luci-static/resources/view/dawn2/dawn2.js
