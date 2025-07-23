@@ -6,7 +6,7 @@
 'require ui';
 'require form';
 'require uci';
-'require dawn.dawn-common as dawn';
+'require dawn.dawn2-common as dawn';
 
 var dawnHearingMapData, dawnNetworkData, hostHintsData;
 
