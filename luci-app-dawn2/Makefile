@@ -14,7 +14,7 @@ PKG_MAINTAINER:=brudalevante
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
-PKG_BUILD_DEPENDS:=po2lmo/host
+PKG_BUILD_DEPENDS:=luci-base/host
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -42,7 +42,7 @@ define Build/Compile
 		base=$$(basename $${po%.po}); \
 		dest="$(PKG_BUILD_DIR)/$$base.$$lang.lmo"; \
 		echo "Compilando $$po → $$dest"; \
-		po2lmo "$$po" "$$dest"; \
+		$(STAGING_DIR_HOSTPKG)/bin/po2lmo "$$po" "$$dest"; \
 	done
 endef
 
