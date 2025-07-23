@@ -37,17 +37,13 @@ define Build/Prepare
 endef
 
 define Build/Compile
-	@echo "DEBUG: Listando archivos .po en $(PKG_BUILD_DIR)/po/*/*.po"
-	@ls -l $(PKG_BUILD_DIR)/po/*/*.po || true
-	@for po in $(wildcard $(PKG_BUILD_DIR)/po/*/*.po); do \
+	@for po in $(PKG_BUILD_DIR)/po/*/*.po; do \
 		lang=$$(basename $$(dirname $$po)); \
 		base=$$(basename $${po%.po}); \
 		dest="$(PKG_BUILD_DIR)/$$base.$$lang.lmo"; \
-		echo "DEBUG: Ejecutando po2lmo para $$po → $$dest"; \
+		echo "Compilando $$po → $$dest"; \
 		po2lmo "$$po" "$$dest"; \
 	done
-	@echo "DEBUG: Listando archivos .lmo generados:"
-	@ls -l $(PKG_BUILD_DIR)/*.lmo || true
 endef
 
 define Package/luci-app-dawn2/install
