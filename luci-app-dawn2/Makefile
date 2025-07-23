@@ -18,7 +18,6 @@ PKG_BUILD_DEPENDS:=luci-base/host
 
 include $(INCLUDE_DIR)/package.mk
 
-# ==== AJUSTA AQUÍ EL MENU ====
 define Package/luci-app-dawn2
 	CATEGORY:=Mesh
 	SUBMENU:=Configuration Fake Mesh Support
@@ -33,23 +32,17 @@ endef
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
-	mkdir -p $(PKG_BUILD_DIR)/po
-	cp -r $(CURDIR)/po/* $(PKG_BUILD_DIR)/po/
+	mkdir -p $(PKG_BUILD_DIR)/po/es
+	cp $(CURDIR)/po/es/dawn2.po $(PKG_BUILD_DIR)/po/es/dawn2.po
 endef
 
 define Build/Compile
-	@for po in $(PKG_BUILD_DIR)/po/*/*.po; do \
-		lang=$$(basename $$(dirname $$po)); \
-		base=$$(basename $${po%.po}); \
-		dest="$(PKG_BUILD_DIR)/$$base.$$lang.lmo"; \
-		echo "Compilando $$po → $$dest"; \
-		$(STAGING_DIR_HOSTPKG)/bin/po2lmo "$$po" "$$dest"; \
-	done
+	$(STAGING_DIR_HOSTPKG)/bin/po2lmo $(PKG_BUILD_DIR)/po/es/dawn2.po $(PKG_BUILD_DIR)/dawn2.es.lmo
 endef
 
 define Package/luci-app-dawn2/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/*.lmo $(1)/usr/lib/lua/luci/i18n/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.es.lmo $(1)/usr/lib/lua/luci/i18n/
 
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
