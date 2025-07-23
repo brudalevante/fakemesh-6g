@@ -41,18 +41,23 @@ define Build/Compile
 endef
 
 define Package/luci-app-dawn2/install
+	# Traducciones
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.es.lmo $(1)/usr/lib/lua/luci/i18n/
 
+	# Menú JSON moderno
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
 
+	# ACL para permisos LuCI
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
 
+	# Recursos comunes (si los usas)
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
-	$(INSTALL_DATA) ./www/luci-static/resources/dawn/dawn2-common.js $(1)/www/luci-static/resources/dawn/dawn2-common.js
+	-$(INSTALL_DATA) ./www/luci-static/resources/dawn/dawn2-common.js $(1)/www/luci-static/resources/dawn/dawn2-common.js
 
+	# Vista moderna (JS)
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
 	$(INSTALL_DATA) ./www/luci-static/resources/view/dawn2/dawn2.js $(1)/www/luci-static/resources/view/dawn2/dawn2.js
 endef
