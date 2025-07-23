@@ -30,28 +30,33 @@ define Package/luci-app-dawn2/description
 	LuCI Support for dawn2.
 endef
 
+# Traducciones (si tienes archivos .po)
 define Build/Prepare
 	$(call Build/Prepare/Default)
-	mkdir -p $(PKG_BUILD_DIR)/po/es
-	cp $(CURDIR)/po/es/dawn2.po $(PKG_BUILD_DIR)/po/es/dawn2.po
+	if [ -f $(CURDIR)/po/es/dawn2.po ]; then \
+		mkdir -p $(PKG_BUILD_DIR)/po/es; \
+		cp $(CURDIR)/po/es/dawn2.po $(PKG_BUILD_DIR)/po/es/dawn2.po; \
+	fi
 endef
 
 define Build/Compile
-	$(STAGING_DIR_HOSTPKG)/bin/po2lmo $(PKG_BUILD_DIR)/po/es/dawn2.po $(PKG_BUILD_DIR)/dawn2.es.lmo
+	if [ -f $(PKG_BUILD_DIR)/po/es/dawn2.po ]; then \
+		$(STAGING_DIR_HOSTPKG)/bin/po2lmo $(PKG_BUILD_DIR)/po/es/dawn2.po $(PKG_BUILD_DIR)/dawn2.es.lmo; \
+	fi
 endef
 
 define Package/luci-app-dawn2/install
 	# Traducciones
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.es.lmo $(1)/usr/lib/lua/luci/i18n/
+	-$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.es.lmo $(1)/usr/lib/lua/luci/i18n/
 
-	# Menú JSON moderno
+	# Menú JSON moderno (si lo usas)
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
+	-$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
 
 	# ACL para permisos LuCI
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
+	-$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
 
 	# Recursos comunes (si los usas)
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
@@ -60,6 +65,10 @@ define Package/luci-app-dawn2/install
 	# Vista moderna (JS)
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
 	$(INSTALL_DATA) ./www/luci-static/resources/view/dawn2/dawn2.js $(1)/www/luci-static/resources/view/dawn2/dawn2.js
+
+	# Controlador LUA
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
+	$(INSTALL_DATA) ./usr/lib/lua/luci/controller/dwan2.lua $(1)/usr/lib/lua/luci/controller/
 endef
 
 $(eval $(call BuildPackage,luci-app-dawn2))
