@@ -3,54 +3,22 @@
 
 include $(TOPDIR)/rules.mk
 
+LUCI_TITLE:=LuCI Support for fakemesh
+LUCI_PKGARCH:=all
+LUCI_DEPENDS:=+jsonfilter +umdns +firewall4
+
 PKG_NAME:=luci-app-fakemesh
 PKG_VERSION:=1.0.2
 PKG_RELEASE:=1
 
-PKG_LICENSE:=GPLv3
-PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Chen Minqiang <ptpt52@gmail.com>
-
-include $(INCLUDE_DIR)/package.mk
-
-define Package/luci-app-fakemesh
-  CATEGORY:=Mesh
-  SUBMENU:=Configuration Fake Mesh Support
-  TITLE:=LuCI Support for fakemesh
-  PKGARCH:=all
-  DEPENDS:=+jsonfilter +umdns +firewall4
-endef
-
-define Package/luci-app-fakemesh/description
-LuCI Support for fakemesh.
-endef
-
-define Build/Prepare
-	$(foreach po,$(wildcard $(CURDIR)/files/luci/i18n/*.po), \
-		po2lmo $(po) $(CURDIR)/files/luci/i18n/$(notdir $(patsubst %.po,%.lmo,$(po)));)
-endef
+include $(TOPDIR)/feeds/luci/luci.mk
 
 define Package/luci-app-fakemesh/conffiles
 /etc/config/fakemesh
 endef
 
-define Package/luci-app-fakemesh/postinst
-#!/bin/sh
-if [ -z "$$IPKG_INSTROOT" ]; then
-  ( . /etc/uci-defaults/40_luci-app-fakemesh )
-  rm -f /etc/uci-defaults/40_luci-app-fakemesh
-  ( . /etc/uci-defaults/96-fakemesh-defaults )
-  rm -f /etc/uci-defaults/96-fakemesh-defaults
-
-  rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
-fi
-
-exit 0
-endef
-
 define Package/luci-app-fakemesh/install
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	-$(INSTALL_DATA) $(CURDIR)/files/luci/i18n/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
+	# Configuración principal, scripts y archivos fuera de las rutas LuCI estándar
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./root/etc/config/fakemesh $(1)/etc/config/fakemesh
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -73,5 +41,3 @@ define Package/luci-app-fakemesh/install
 	$(INSTALL_DIR) $(1)/usr/share/ucitrack
 	$(INSTALL_DATA) ./root/usr/share/ucitrack/*.json $(1)/usr/share/ucitrack/
 endef
-
-$(eval $(call BuildPackage,luci-app-fakemesh))
