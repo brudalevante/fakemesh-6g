@@ -18,6 +18,7 @@ define Package/$(PKG_NAME)
   TITLE:=LuCI Support for usteer2
   PKGARCH:=all
   DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
+  MENU:=1
 endef
 
 define Package/$(PKG_NAME)/description
