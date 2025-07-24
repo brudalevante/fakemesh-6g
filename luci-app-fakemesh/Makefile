@@ -1,4 +1,3 @@
-# Copyright (C) 2017-2019 Chen Minqiang <ptpt52@gmail.com>
 # Copyright (C) 2024 brudalevante
 # This is free software, licensed under the GNU General Public License v3.
 
@@ -19,6 +18,7 @@ define Package/$(PKG_NAME)
   TITLE:=LuCI Support for fakemesh
   PKGARCH:=all
   DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
+  MENU:=1
 endef
 
 define Package/$(PKG_NAME)/description
