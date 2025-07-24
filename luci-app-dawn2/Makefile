@@ -1,3 +1,4 @@
+# Makefile for luci-app-dawn2
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/luci.mk
 
@@ -22,6 +23,7 @@ endef
 
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+	# Solo copia los .po, NO .lmo, porque solo tienes .po
 	-$(INSTALL_DATA) ./po/es/*.po $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
