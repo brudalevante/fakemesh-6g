@@ -2,6 +2,7 @@
 # This is free software, licensed under the GNU General Public License v3.
 
 include $(TOPDIR)/rules.mk
+include $(INCLUDE_DIR)/luci.mk
 
 PKG_NAME:=luci-app-dawn2
 PKG_VERSION:=1.0.0
@@ -9,8 +10,6 @@ PKG_RELEASE:=1
 
 PKG_LICENSE:=GPLv3
 PKG_MAINTAINER:=brudalevante
-
-include $(INCLUDE_DIR)/package.mk
 
 define Package/$(PKG_NAME)
   SECTION:=Mesh
