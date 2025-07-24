@@ -3,7 +3,6 @@
 # This is free software, licensed under the GNU General Public License v3.
 
 include $(TOPDIR)/rules.mk
-include $(INCLUDE_DIR)/luci.mk
 
 PKG_NAME:=luci-app-fakemesh
 PKG_VERSION:=1.0.2
@@ -12,6 +11,8 @@ PKG_RELEASE:=1
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=brudalevante
+
+include $(INCLUDE_DIR)/package.mk
 
 define Package/$(PKG_NAME)
   SECTION:=Mesh
@@ -31,11 +32,9 @@ define Package/$(PKG_NAME)/conffiles
 endef
 
 define Package/$(PKG_NAME)/install
-	# Traducciones
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
 	-$(INSTALL_DATA) ./po/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 
-	# Configuración principal, scripts y archivos fuera de las rutas LuCI estándar
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./root/etc/config/fakemesh $(1)/etc/config/fakemesh
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -50,7 +49,6 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface/
 	$(INSTALL_DATA) ./root/etc/hotplug.d/iface/19-fakemesh $(1)/etc/hotplug.d/iface/19-fakemesh
 
-	# LuCI/ACL/menús
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/*.json $(1)/usr/share/rpcd/acl.d/
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
