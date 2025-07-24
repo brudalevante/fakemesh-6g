@@ -12,9 +12,8 @@ PKG_LICENSE:=GPLv3
 PKG_MAINTAINER:=brudalevante
 
 define Package/$(PKG_NAME)
-  SECTION:=Mesh
-  CATEGORY:=Mesh
-  SUBMENU:=Configuration Fake Mesh Support
+  CATEGORY:=Network
+  SUBMENU:=Mesh
   TITLE:=LuCI Support for dawn2
   PKGARCH:=all
   DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
