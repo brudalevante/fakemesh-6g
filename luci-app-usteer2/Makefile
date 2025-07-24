@@ -3,39 +3,20 @@
 
 include $(TOPDIR)/rules.mk
 
+LUCI_TITLE:=LuCI Support for usteer2
+LUCI_PKGARCH:=all
+LUCI_DEPENDS:=+jsonfilter +umdns +firewall4
+
 PKG_NAME:=luci-app-usteer2
 PKG_VERSION:=1.0.0
 PKG_RELEASE:=1
 
-PKG_LICENSE:=GPLv3
-PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=brudalevante
-
-include $(INCLUDE_DIR)/package.mk
-
-define Package/luci-app-usteer2
-  CATEGORY:=Mesh
-  SUBMENU:=Configuration Fake Mesh Support
-  TITLE:=LuCI Support for usteer2
-  PKGARCH:=all
-  DEPENDS:=+jsonfilter +umdns +firewall4
-endef
-
-define Package/luci-app-usteer2/description
-LuCI Support for usteer2.
-endef
-
-define Build/Prepare
-	$(call Build/Prepare/Default)
-	# Traducciones (.po a .lmo)
-	$(foreach po,$(wildcard $(CURDIR)/po/*/*.po), \
-		po2lmo $(po) $(CURDIR)/po/$(notdir $(patsubst %.po,%.lmo,$(po)));)
-endef
+include $(TOPDIR)/feeds/luci/luci.mk
 
 define Package/luci-app-usteer2/install
 	# Traducciones
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	-$(INSTALL_DATA) $(CURDIR)/po/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
+	-$(INSTALL_DATA) ./po/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 
 	# Menú JSON
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
@@ -53,5 +34,3 @@ define Package/luci-app-usteer2/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DATA) ./usr/lib/lua/luci/controller/usteer2.lua $(1)/usr/lib/lua/luci/controller/usteer2.lua
 endef
-
-$(eval $(call BuildPackage,luci-app-usteer2))
