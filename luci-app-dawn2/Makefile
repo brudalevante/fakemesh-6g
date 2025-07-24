@@ -13,9 +13,9 @@ PKG_MAINTAINER:=brudalevante
 include $(INCLUDE_DIR)/package.mk
 
 define Package/luci-app-dawn2
-  SECTION:=luci
-  CATEGORY:=LuCI
-  SUBMENU:=3. Applications
+  SECTION:=Mesh
+  CATEGORY:=Mesh
+  SUBMENU:=Configuration Fake Mesh Support
   TITLE:=LuCI Support for dawn2
   PKGARCH:=all
   DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
