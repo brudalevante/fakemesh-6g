@@ -1,3 +1,4 @@
+# Makefile para luci-app-fakemesh
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/luci.mk
 
@@ -27,6 +28,7 @@ endef
 
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+	# Copia los .po desde files/luci/i18n/
 	-$(INSTALL_DATA) ./files/luci/i18n/*.po $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 
 	$(INSTALL_DIR) $(1)/etc/config
