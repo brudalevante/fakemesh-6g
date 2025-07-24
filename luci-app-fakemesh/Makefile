@@ -1,6 +1,5 @@
 # Copyright (C) 2017-2019 Chen Minqiang <ptpt52@gmail.com>
 # This is free software, licensed under the GNU General Public License v3.
-# See /LICENSE for more information.
 
 include $(TOPDIR)/rules.mk
 
@@ -11,8 +10,6 @@ PKG_RELEASE:=1
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Chen Minqiang <ptpt52@gmail.com>
-
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -29,14 +26,8 @@ LuCI Support for fakemesh.
 endef
 
 define Build/Prepare
-	$(foreach po,$(wildcard ${CURDIR}/files/luci/i18n/*.po), \
-		po2lmo $(po) $(PKG_BUILD_DIR)/$(patsubst %.po,%.lmo,$(notdir $(po)));)
-endef
-
-define Build/Configure
-endef
-
-define Build/Compile
+	$(foreach po,$(wildcard $(CURDIR)/files/luci/i18n/*.po), \
+		po2lmo $(po) $(CURDIR)/files/luci/i18n/$(notdir $(patsubst %.po,%.lmo,$(po)));)
 endef
 
 define Package/luci-app-fakemesh/conffiles
@@ -59,7 +50,7 @@ endef
 
 define Package/luci-app-fakemesh/install
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/fakemesh.*.lmo $(1)/usr/lib/lua/luci/i18n/
+	-$(INSTALL_DATA) $(CURDIR)/files/luci/i18n/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./root/etc/config/fakemesh $(1)/etc/config/fakemesh
 	$(INSTALL_DIR) $(1)/etc/init.d
