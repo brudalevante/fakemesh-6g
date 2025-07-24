@@ -3,21 +3,45 @@
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=LuCI Support for fakemesh
-LUCI_PKGARCH:=all
-LUCI_DEPENDS:=+jsonfilter +umdns +firewall4
-
 PKG_NAME:=luci-app-fakemesh
 PKG_VERSION:=1.0.2
 PKG_RELEASE:=1
 
-include $(TOPDIR)/feeds/luci/luci.mk
+PKG_LICENSE:=GPLv3
+PKG_LICENSE_FILES:=LICENSE
+PKG_MAINTAINER:=brudalevante
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/luci-app-fakemesh
+  SECTION:=luci
+  CATEGORY:=LuCI
+  SUBMENU:=3. Applications
+  TITLE:=LuCI Support for fakemesh
+  PKGARCH:=all
+  DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
+endef
+
+define Package/luci-app-fakemesh/description
+LuCI Support for fakemesh.
+endef
 
 define Package/luci-app-fakemesh/conffiles
 /etc/config/fakemesh
 endef
 
+define Build/Prepare
+	$(call Build/Prepare/Default)
+	# Traducciones (.po a .lmo)
+	$(foreach po,$(wildcard $(CURDIR)/po/*/*.po), \
+		po2lmo $(po) $(CURDIR)/po/$(notdir $(patsubst %.po,%.lmo,$(po)));)
+endef
+
 define Package/luci-app-fakemesh/install
+	# Traducciones
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+	-$(INSTALL_DATA) ./po/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
+
 	# Configuración principal, scripts y archivos fuera de las rutas LuCI estándar
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./root/etc/config/fakemesh $(1)/etc/config/fakemesh
@@ -32,6 +56,8 @@ define Package/luci-app-fakemesh/install
 	$(INSTALL_DATA) ./root/etc/hotplug.d/dhcp/10-fakemesh $(1)/etc/hotplug.d/dhcp/10-fakemesh
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface/
 	$(INSTALL_DATA) ./root/etc/hotplug.d/iface/19-fakemesh $(1)/etc/hotplug.d/iface/19-fakemesh
+
+	# LuCI/ACL/menús
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/*.json $(1)/usr/share/rpcd/acl.d/
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
@@ -41,3 +67,5 @@ define Package/luci-app-fakemesh/install
 	$(INSTALL_DIR) $(1)/usr/share/ucitrack
 	$(INSTALL_DATA) ./root/usr/share/ucitrack/*.json $(1)/usr/share/ucitrack/
 endef
+
+$(eval $(call BuildPackage,luci-app-fakemesh))
