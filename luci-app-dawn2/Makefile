@@ -12,7 +12,7 @@ PKG_MAINTAINER:=brudalevante
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/luci-app-dawn2
+define Package/$(PKG_NAME)
   SECTION:=Mesh
   CATEGORY:=Mesh
   SUBMENU:=Configuration Fake Mesh Support
@@ -21,18 +21,11 @@ define Package/luci-app-dawn2
   DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
 endef
 
-define Package/luci-app-dawn2/description
+define Package/$(PKG_NAME)/description
 LuCI Support for dawn2.
 endef
 
-define Build/Prepare
-	$(call Build/Prepare/Default)
-	# Traducciones (.po a .lmo)
-	$(foreach po,$(wildcard $(CURDIR)/po/*/*.po), \
-		po2lmo $(po) $(CURDIR)/po/$(notdir $(patsubst %.po,%.lmo,$(po)));)
-endef
-
-define Package/luci-app-dawn2/install
+define Package/$(PKG_NAME)/install
 	# Traducciones
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
 	-$(INSTALL_DATA) ./po/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
@@ -58,4 +51,4 @@ define Package/luci-app-dawn2/install
 	$(INSTALL_DATA) ./usr/lib/lua/luci/controller/dawn2.lua $(1)/usr/lib/lua/luci/controller/dawn2.lua
 endef
 
-$(eval $(call BuildPackage,luci-app-dawn2))
+$(eval $(call BuildPackage,$(PKG_NAME)))
