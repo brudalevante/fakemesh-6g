@@ -15,7 +15,7 @@ PKG_MAINTAINER:=brudalevante
 include $(INCLUDE_DIR)/package.mk
 
 define Package/luci-app-usteer2
-  CATEGORY:=X
+  CATEGORY:=Mesh
   SUBMENU:=Configuration Fake Mesh Support
   TITLE:=LuCI Support for usteer2
   PKGARCH:=all
@@ -52,7 +52,7 @@ define Package/luci-app-usteer2/install
 
 	# Instalar controlador Lua
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_DATA) ./usr/lib/lua/controller/usteer2.lua $(1)/usr/lib/lua/luci/controller/usteer2.lua
+	$(INSTALL_DATA) ./usr/lib/lua/luci/controller/usteer2.lua $(1)/usr/lib/lua/luci/controller/usteer2.lua
 endef
 
 $(eval $(call BuildPackage,luci-app-usteer2))
