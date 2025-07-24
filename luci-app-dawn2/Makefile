@@ -12,63 +12,51 @@ PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=brudalevante
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
-
-PKG_BUILD_DEPENDS:=luci-base/host
-
 include $(INCLUDE_DIR)/package.mk
 
 define Package/luci-app-dawn2
-	CATEGORY:=Mesh
-	SUBMENU:=Configuration Fake Mesh Support
-	TITLE:=LuCI Support for dawn2
-	PKGARCH:=all
-	DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
+  CATEGORY:=Mesh
+  SUBMENU:=Configuration Fake Mesh Support
+  TITLE:=LuCI Support for dawn2
+  PKGARCH:=all
+  DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
 endef
 
 define Package/luci-app-dawn2/description
-	LuCI Support for dawn2.
+LuCI Support for dawn2.
 endef
 
-# Traducciones (si tienes archivos .po)
 define Build/Prepare
 	$(call Build/Prepare/Default)
-	if [ -f $(CURDIR)/po/es/dawn2.po ]; then \
-		mkdir -p $(PKG_BUILD_DIR)/po/es; \
-		cp $(CURDIR)/po/es/dawn2.po $(PKG_BUILD_DIR)/po/es/dawn2.po; \
-	fi
-endef
-
-define Build/Compile
-	if [ -f $(PKG_BUILD_DIR)/po/es/dawn2.po ]; then \
-		$(STAGING_DIR_HOSTPKG)/bin/po2lmo $(PKG_BUILD_DIR)/po/es/dawn2.po $(PKG_BUILD_DIR)/dawn2.es.lmo; \
-	fi
+	# Traducciones (si existen)
+	$(foreach po,$(wildcard $(CURDIR)/po/*/*.po), \
+		po2lmo $(po) $(PKG_BUILD_DIR)/$(notdir $(patsubst %.po,%.lmo,$(po)));)
 endef
 
 define Package/luci-app-dawn2/install
-	# Traducciones
+	# Instalar traducciones (si existen)
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	-$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.es.lmo $(1)/usr/lib/lua/luci/i18n/
+	-$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.*.lmo $(1)/usr/lib/lua/luci/i18n/
 
-	# Menú JSON moderno (si lo usas)
+	# Instalar menú JSON moderno
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	-$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
+	$(INSTALL_DATA) ./usr/share/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
 
-	# ACL para permisos LuCI
+	# Instalar ACL para permisos LuCI
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	-$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
+	$(INSTALL_DATA) ./usr/share/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
 
-	# Recursos comunes (si los usas)
+	# Instalar recursos comunes (si existen)
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
 	-$(INSTALL_DATA) ./www/luci-static/resources/dawn/dawn2-common.js $(1)/www/luci-static/resources/dawn/dawn2-common.js
 
-	# Vista moderna (JS)
+	# Instalar vista JS moderna
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
 	$(INSTALL_DATA) ./www/luci-static/resources/view/dawn2/dawn2.js $(1)/www/luci-static/resources/view/dawn2/dawn2.js
 
-	# Controlador LUA
+	# Instalar controlador Lua
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_DATA) ./usr/lib/lua/luci/controller/dwan2.lua $(1)/usr/lib/lua/luci/controller/
+	$(INSTALL_DATA) ./usr/lib/lua/luci/controller/dawn2.lua $(1)/usr/lib/lua/luci/controller/dawn2.lua
 endef
 
 $(eval $(call BuildPackage,luci-app-dawn2))
