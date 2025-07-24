@@ -13,9 +13,8 @@ PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=brudalevante
 
 define Package/$(PKG_NAME)
-  SECTION:=Mesh
-  CATEGORY:=Mesh
-  SUBMENU:=Configuration Fake Mesh Support
+  CATEGORY:=Network
+  SUBMENU:=Mesh
   TITLE:=LuCI Support for usteer2
   PKGARCH:=all
   DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
