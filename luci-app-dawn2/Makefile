@@ -1,6 +1,3 @@
-# Copyright (C) 2024 brudalevante
-# This is free software, licensed under the GNU General Public License v3.
-
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/luci.mk
 
