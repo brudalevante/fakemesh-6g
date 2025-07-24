@@ -1,4 +1,5 @@
 # Copyright (C) 2017-2019 Chen Minqiang <ptpt52@gmail.com>
+# Copyright (C) 2024 brudalevante
 # This is free software, licensed under the GNU General Public License v3.
 
 include $(TOPDIR)/rules.mk
@@ -13,7 +14,7 @@ PKG_MAINTAINER:=brudalevante
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/luci-app-fakemesh
+define Package/$(PKG_NAME)
   SECTION:=Mesh
   CATEGORY:=Mesh
   SUBMENU:=Configuration Fake Mesh Support
@@ -22,22 +23,15 @@ define Package/luci-app-fakemesh
   DEPENDS:=+luci-base +jsonfilter +umdns +firewall4
 endef
 
-define Package/luci-app-fakemesh/description
+define Package/$(PKG_NAME)/description
 LuCI Support for fakemesh.
 endef
 
-define Package/luci-app-fakemesh/conffiles
+define Package/$(PKG_NAME)/conffiles
 /etc/config/fakemesh
 endef
 
-define Build/Prepare
-	$(call Build/Prepare/Default)
-	# Traducciones (.po a .lmo)
-	$(foreach po,$(wildcard $(CURDIR)/po/*/*.po), \
-		po2lmo $(po) $(CURDIR)/po/$(notdir $(patsubst %.po,%.lmo,$(po)));)
-endef
-
-define Package/luci-app-fakemesh/install
+define Package/$(PKG_NAME)/install
 	# Traducciones
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
 	-$(INSTALL_DATA) ./po/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
@@ -68,4 +62,4 @@ define Package/luci-app-fakemesh/install
 	$(INSTALL_DATA) ./root/usr/share/ucitrack/*.json $(1)/usr/share/ucitrack/
 endef
 
-$(eval $(call BuildPackage,luci-app-fakemesh))
+$(eval $(call BuildPackage,$(PKG_NAME)))
