@@ -23,7 +23,6 @@ define Package/$(PKG_NAME)/description
 LuCI Support for dawn2.
 endef
 
-# Convierte dawn2.po en dawn2.lmo
 define Build/Prepare
 	$(foreach po,$(wildcard $(CURDIR)/po/es/*.po), \
 		po2lmo $(po) $(PKG_BUILD_DIR)/$(patsubst %.po,%.lmo,$(notdir $(po)));)
@@ -53,6 +52,14 @@ define Package/$(PKG_NAME)/install
 
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
 	$(INSTALL_DATA) $(CURDIR)/www/luci-static/resources/view/dawn2/dawn2.js $(1)/www/luci-static/resources/view/dawn2/dawn2.js
+
+	# Instala el archivo de configuración por defecto
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) $(CURDIR)/etc/config/dawn2 $(1)/etc/config/dawn2
+endef
+
+define Package/$(PKG_NAME)/conffiles
+/etc/config/dawn2
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
