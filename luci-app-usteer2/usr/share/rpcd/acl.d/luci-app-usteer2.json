@@ -1,22 +1,19 @@
 {
-  "luci-app-usteer": {
-    "description": "Grant UCI access to LuCI app usteer",
+  "luci-app-usteer2": {
+    "description": "Grant UCI access to LuCI app usteer2",
     "read": {
       "ubus": {
-        "uci": [ "get" ],
-        "usteer": [ "remote_info","remote_hosts", "local_info", "get_clients"],
-        "luci-rpc": [ "getHostHints" ],
-        "network.rrdns": [ "lookup" ]
+        "uci": [ "get" ]
       },
       "uci": [
-        "usteer"
+        "usteer2"
       ]
     },
     "write": {
       "ubus": {
-        "uci": [ "set", "commit"  ]
+        "uci": [ "set", "commit" ]
       },
-      "uci": [ "usteer" ]
+      "uci": [ "usteer2" ]
     }
   }
 }
