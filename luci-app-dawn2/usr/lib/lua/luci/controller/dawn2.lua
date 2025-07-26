@@ -1,5 +1,5 @@
-module("luci.controller.dwan2", package.seeall)
+module("luci.controller.dawn2", package.seeall)
 
 function index()
-    entry({"admin", "network", "dwan2"}, view("dwan2/dwan2"), _("DWAN2"), 91)
+    entry({"admin", "network", "dawn2"}, view("dawn2/dawn2"), _("DAWN2"), 91)
 end
