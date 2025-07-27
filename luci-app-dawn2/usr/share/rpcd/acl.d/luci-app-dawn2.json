@@ -2,7 +2,7 @@
   "luci-app-dawn2": {
     "description": "Grant UCI and RPC access for luci-app-dawn2",
     "read": {
-      "uci": [ "dawn2" ],
+      "uci": [ "dawn2", "network", "wireless", "dhcp" ],
       "ubus": {
         "dawn2": [ "get_network", "get_hearing_map" ],
         "luci-rpc": [ "getHostHints" ]
@@ -10,7 +10,7 @@
       "luci": [ "getHostHints" ]
     },
     "write": {
-      "uci": [ "dawn2" ]
+      "uci": [ "dawn2", "network", "wireless", "dhcp" ]
     }
   }
 }
