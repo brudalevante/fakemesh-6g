@@ -17,7 +17,7 @@ callDawnGetHearingMap = rpc.declare({
 });
 
 callHostHints = rpc.declare({
-    object: 'luci',
+    object: 'luci-rpc',
     method: 'getHostHints',
     expect: {}
 });
