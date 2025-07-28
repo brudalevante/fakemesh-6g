@@ -1,0 +1,10 @@
+{
+  "admin/mesh/dawn2": {
+    "title": "DAWN2",                  // Nombre que aparece en el menú
+    "order": 40,                       // Orden de aparición (menor número, más arriba)
+    "action": {
+      "type": "view",                  // Tipo de acción: muestra una vista
+      "path": "dawn2/dawn2"            // Ruta de la vista JS asociada
+    }
+  }
+}
