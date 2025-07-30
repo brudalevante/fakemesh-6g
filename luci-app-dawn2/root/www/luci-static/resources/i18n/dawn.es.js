@@ -1,5 +1,5 @@
 'use strict';
-'uictl';
+
 module.exports = {
     "DAWN": "DAWN",
     "DAWN Settings": "Configuración de DAWN",
