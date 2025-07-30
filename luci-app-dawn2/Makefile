@@ -31,20 +31,39 @@ define Build/Configure
 endef
 
 define Package/$(PKG_NAME)/install
+	# i18n
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn.es.lmo $(1)/usr/lib/lua/luci/i18n/
+
+	# Controlador
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/controller/dawn.lua $(1)/usr/lib/lua/luci/controller/dawn.lua
+
+	# Vista
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/dawn2
+	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/view/dawn2/dawn.htm $(1)/usr/lib/lua/luci/view/dawn2/dawn.htm
+
+	# Menú LuCI
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(INSTALL_DATA) $(CURDIR)/root/usr/share/luci/menu.d/luci-app-dawn.json $(1)/usr/share/luci/menu.d/luci-app-dawn.json
+
+	# Permisos RPCD
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) $(CURDIR)/root/usr/share/rpcd/acl.d/luci-app-dawn.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn.json
+
+	# JS en la ruta correcta para la vista dawn2
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
+	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/view/dawn2/dawn.js $(1)/www/luci-static/resources/view/dawn2/dawn.js
+
+	# JS común (si lo usas en otras partes)
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
 	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/dawn/dawn-common.js $(1)/www/luci-static/resources/dawn/dawn-common.js
+
+	# JS de internacionalización
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/i18n
 	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/i18n/dawn.es.js $(1)/www/luci-static/resources/i18n/dawn.es.js
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn
-	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/view/dawn/dawn.js $(1)/www/luci-static/resources/view/dawn/dawn.js
+
+	# Configuración
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) $(CURDIR)/root/etc/config/dawn $(1)/etc/config/dawn
 endef
