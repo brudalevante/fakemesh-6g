@@ -1,0 +1,8 @@
+config dawn 'config'
+    option broadcast_ip '255.255.255.255'
+    option broadcast_port '1025'
+    option security 'psk2'
+    option metric 'rssi'
+
+config local
+    option loglevel '5'
