@@ -1,22 +1,19 @@
 'use strict';
-'require baseclass';
 'require rpc';
 
-let callDawnGetNetwork, callDawnGetHearingMap, callHostHints;
-
-callDawnGetNetwork = rpc.declare({
+let callDawnGetNetwork = rpc.declare({
     object: 'dawn',
     method: 'get_network',
     expect: []
 });
 
-callDawnGetHearingMap = rpc.declare({
+let callDawnGetHearingMap = rpc.declare({
     object: 'dawn',
     method: 'get_hearing_map',
     expect: []
 });
 
-callHostHints = rpc.declare({
+let callHostHints = rpc.declare({
     object: 'luci-rpc',
     method: 'getHostHints',
     expect: {}
@@ -29,8 +26,12 @@ function isDawnRPCAvailable() {
     });
 }
 
-function getAvailableText(available) { return available ? _('Available') : _('Not available'); }
-function getYesText(yes) { return yes ? _('Yes') : _('No'); }
+function getAvailableText(available) {
+    return available ? _('Available') : _('Not available');
+}
+function getYesText(yes) {
+    return yes ? _('Yes') : _('No');
+}
 function getChannelFromFrequency(freq) {
     if (freq < 2400) { return 0; }
     else if (freq === 2484) { return 14; }
@@ -40,9 +41,18 @@ function getChannelFromFrequency(freq) {
     else if (freq >= 5925 && freq <= 7125) { return Math.floor((freq - 5955) / 5) + 1; } // 6 GHz (WiFi 6E/7)
     else { return 0; }
 }
-function getFormattedNumber(num, decimals, divider = 1) { return (num / divider).toFixed(decimals); }
-function getHostnameFromMAC(hosthints, mac) { return (hosthints[mac] && hosthints[mac].name ? hosthints[mac].name + ' (' + mac + ')' : mac); }
-function getDawnServiceNotRunningErrorMessage() { return E('div', { class: 'alert-message fade-in warning' }, [E('h4', _('DAWN service unavailable')), E('p', _('Unable to query the DAWN service.'))]); }
+function getFormattedNumber(num, decimals, divider = 1) {
+    return (num / divider).toFixed(decimals);
+}
+function getHostnameFromMAC(hosthints, mac) {
+    return (hosthints[mac] && hosthints[mac].name ? hosthints[mac].name + ' (' + mac + ')' : mac);
+}
+function getDawnServiceNotRunningErrorMessage() {
+    return E('div', { class: 'alert-message fade-in warning' }, [
+        E('h4', _('DAWN service unavailable')),
+        E('p', _('Unable to query the DAWN service.'))
+    ]);
+}
 
 return L.Class.extend({
     callDawnGetNetwork: callDawnGetNetwork,

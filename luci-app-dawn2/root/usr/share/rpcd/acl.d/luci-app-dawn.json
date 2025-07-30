@@ -1,0 +1,23 @@
+{
+  "luci-app-dawn": {
+    "description": "Grant access to LuCI app DAWN",
+    "read": {
+      "uci": [ "dawn" ],
+      "ubus": {
+        "dawn": [ "*" ]
+      },
+      "file": {
+        "/etc/config/dawn": [ "read" ]
+      }
+    },
+    "write": {
+      "uci": [ "dawn" ],
+      "ubus": {
+        "dawn": [ "*" ]
+      },
+      "file": {
+        "/etc/config/dawn": [ "write" ]
+      }
+    }
+  }
+}

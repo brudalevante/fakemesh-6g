@@ -1,8 +1,0 @@
-{
-  "luci-base": {
-    "description": "Grant minimal access for LuCI",
-    "read": {
-      "luci": [ "getHostHints" ]
-    }
-  }
-}
