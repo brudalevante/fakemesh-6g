@@ -1,6 +1,6 @@
 {
-  "luci-app-dawn": {
-    "description": "Grant access to LuCI app DAWN",
+  "luci-app-dawn2": {
+    "description": "Grant access to LuCI app DAWN2",
     "read": {
       "uci": [ "dawn" ],
       "ubus": {
