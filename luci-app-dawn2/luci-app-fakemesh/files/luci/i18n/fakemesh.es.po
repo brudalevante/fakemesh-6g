@@ -1,0 +1,53 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Fake Mesh Setup"
+msgstr "Configuración Fake Mesh"
+
+msgid "Fake Mesh"
+msgstr "Fake Mesh"
+
+msgid "Role"
+msgstr "Rol"
+
+msgid "Leave empty if encryption is not required."
+msgstr "Dejar vacío si no se requiere cifrado."
+
+msgid "Set the gateway router as controller, others as agent."
+msgstr "Establece el router gateway como controlador, otros como agente."
+
+msgid "Wired AP (ethernet as backhaul)"
+msgstr "AP cableado (ethernet como backhaul)"
+
+msgid "Agent (wifi as backhaul)"
+msgstr "Agente (wifi como backhaul)"
+
+msgid "Controller (AC)"
+msgstr "Controlador (AC)"
+
+msgid "The simple ip address to access the controller."
+msgstr "La dirección IP simple para acceder al controlador."
+
+msgid "Access IP address"
+msgstr "Dirección IP de acceso"
+
+msgid "Sync Config"
+msgstr "Sincronizar configuración"
+
+msgid "Sync config from the Controller."
+msgstr "Sincronizar configuración desde el controlador."
+
+msgid "Wireless Management"
+msgstr "Gestión inalámbrica"
+
+msgid "Not available on AP"
+msgstr "No disponible en AP"
+
+msgid "Band Steer Helper"
+msgstr "Auxiliar de bandas"
+
+msgid "Fronthaul Disabled"
+msgstr "Fronthaul deshabilitado"
+
+msgid "Disable fronthaul Wi-Fi signal on this node."
+msgstr "Deshabilitar señal Wi-Fi fronthaul en este nodo."
