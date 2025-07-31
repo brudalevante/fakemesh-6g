@@ -1,0 +1,71 @@
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=luci-app-dawn2
+PKG_VERSION:=1.0.0
+PKG_RELEASE:=1
+
+PKG_LICENSE:=GPLv3
+PKG_MAINTAINER:=brudalevante
+
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/$(PKG_NAME)
+  CATEGORY:=Network
+  SUBMENU:=Mesh
+  TITLE:=LuCI Support for dawn2
+  PKGARCH:=all
+  DEPENDS:=+jsonfilter +umdns +firewall4
+endef
+
+define Package/$(PKG_NAME)/description
+LuCI Support for dawn2.
+endef
+
+define Build/Compile
+	po2lmo $(CURDIR)/po/es/dawn.po $(PKG_BUILD_DIR)/dawn.es.lmo
+endef
+
+define Build/Configure
+endef
+
+define Package/$(PKG_NAME)/install
+	# i18n LMO
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn.es.lmo $(1)/usr/lib/lua/luci/i18n/
+
+	# Controlador
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
+	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/controller/dawn.lua $(1)/usr/lib/lua/luci/controller/dawn.lua
+
+	# Vista HTM
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/dawn2
+	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/view/dawn2/dawn.htm $(1)/usr/lib/lua/luci/view/dawn2/dawn.htm
+
+	# Menú LuCI
+	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
+	$(INSTALL_DATA) $(CURDIR)/root/usr/share/luci/menu.d/luci-app-dawn.json $(1)/usr/share/luci/menu.d/luci-app-dawn.json
+
+	# Permisos RPCD
+	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
+	$(INSTALL_DATA) $(CURDIR)/root/usr/share/rpcd/acl.d/luci-app-dawn.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn.json
+
+	# JS para la vista
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
+	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/view/dawn2/dawn.js $(1)/www/luci-static/resources/view/dawn2/dawn.js
+
+	# JS común
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn2
+	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/dawn2/dawn-common.js $(1)/www/luci-static/resources/dawn2/dawn-common.js
+
+	# JS de internacionalización
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/i18n
+	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/i18n/dawn.es.js $(1)/www/luci-static/resources/i18n/dawn.es.js
+
+	# Configuración UCI
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) $(CURDIR)/root/etc/config/dawn $(1)/etc/config/dawn
+endef
+
+$(eval $(call BuildPackage,$(PKG_NAME)))

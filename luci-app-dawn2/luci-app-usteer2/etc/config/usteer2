@@ -1,0 +1,7 @@
+config usteer2 'main'
+        option syslog '1'
+        option debug '0'
+        option band_steering '1'
+        option load_balancing '1'
+        option node_timeout '60'
+        option sta_timeout '30'
