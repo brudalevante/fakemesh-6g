@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=luci-app-dawn2
+PKG_NAME:=luci-app-usteer2
 PKG_VERSION:=1.0.0
 PKG_RELEASE:=1
 
@@ -14,49 +14,48 @@ include $(INCLUDE_DIR)/package.mk
 define Package/$(PKG_NAME)
   CATEGORY:=Network
   SUBMENU:=Mesh
-  TITLE:=LuCI Support for dawn2
+  TITLE:=LuCI Support for usteer2
   PKGARCH:=all
   DEPENDS:=+jsonfilter +umdns +firewall4
 endef
 
 define Package/$(PKG_NAME)/description
-LuCI Support for dawn2.
+LuCI Support for usteer2.
 endef
 
-define Build/Compile
-	# Si tienes traducciones LMO, genera aquí
-	# po2lmo $(CURDIR)/po/es/dawn.po $(PKG_BUILD_DIR)/dawn.es.lmo
+define Build/Prepare
 endef
 
 define Build/Configure
 endef
 
+define Build/Compile
+endef
+
 define Package/$(PKG_NAME)/install
-	# Binario DAWN, lo incluye siempre en el paquete
+	# Instala el binario usteer2
 	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(CURDIR)/files/usr/sbin/dawn $(1)/usr/sbin/dawn
+	$(INSTALL_BIN) $(CURDIR)/files/usr/sbin/usteer2 $(1)/usr/sbin/usteer2
 
-	# JS principal
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
-	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/dawn/dawn-common.js $(1)/www/luci-static/resources/dawn/dawn-common.js
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
+	$(INSTALL_DATA) $(CURDIR)/usr/lib/lua/luci/controller/usteer2.lua $(1)/usr/lib/lua/luci/controller/usteer2.lua
 
-	# Vistas JS
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/network
-	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/network/dawn.js $(1)/www/luci-static/resources/view/network/dawn.js
-
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/status/dawn
-	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/status/dawn/hearing_map.js $(1)/www/luci-static/resources/view/status/dawn/hearing_map.js
-	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/status/dawn/network_overview.js $(1)/www/luci-static/resources/view/status/dawn/network_overview.js
-
-	# Menú LuCI
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	$(INSTALL_DATA) $(CURDIR)/root/luci/menu.d/luci-app-dawn.json $(1)/usr/share/luci/menu.d/luci-app-dawn.json
+	$(INSTALL_DATA) $(CURDIR)/usr/share/luci/menu.d/luci-app-usteer2.json $(1)/usr/share/luci/menu.d/luci-app-usteer2.json
 
-	# Permisos RPCD
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(INSTALL_DATA) $(CURDIR)/root/luci/rcpd/acl.d/luci-app-dawn.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn.json
+	$(INSTALL_DATA) $(CURDIR)/usr/share/rpcd/acl.d/luci-app-usteer2.json $(1)/usr/share/rpcd/acl.d/luci-app-usteer2.json
 
-	# Si tienes controladores, vistas Lua, i18n, etc. agrégalos aquí
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/usteer2
+	$(INSTALL_DATA) $(CURDIR)/www/luci-static/resources/view/usteer2/usteer2.js $(1)/www/luci-static/resources/view/usteer2/usteer2.js
+
+	# Instala el archivo de configuración por defecto
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) $(CURDIR)/etc/config/usteer2 $(1)/etc/config/usteer2
+endef
+
+define Package/$(PKG_NAME)/conffiles
+/etc/config/usteer2
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
