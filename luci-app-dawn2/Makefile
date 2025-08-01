@@ -32,6 +32,10 @@ define Build/Configure
 endef
 
 define Package/$(PKG_NAME)/install
+	# Binario DAWN, lo incluye siempre en el paquete
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(CURDIR)/files/usr/sbin/dawn $(1)/usr/sbin/dawn
+
 	# JS principal
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
 	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/dawn/dawn-common.js $(1)/www/luci-static/resources/dawn/dawn-common.js
