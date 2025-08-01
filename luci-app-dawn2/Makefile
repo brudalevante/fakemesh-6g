@@ -62,10 +62,21 @@ define Package/$(PKG_NAME)/install
 	# Instala el archivo de configuración por defecto
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) $(CURDIR)/etc/config/dawn2 $(1)/etc/config/dawn2
+
+	# Instala el script de inicio
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) $(CURDIR)/files/etc/init.d/dawn2 $(1)/etc/init.d/dawn2
 endef
 
 define Package/$(PKG_NAME)/conffiles
 /etc/config/dawn2
+endef
+
+define Package/$(PKG_NAME)/postinst
+#!/bin/sh
+/etc/init.d/dawn2 enable
+/etc/init.d/dawn2 start
+exit 0
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
