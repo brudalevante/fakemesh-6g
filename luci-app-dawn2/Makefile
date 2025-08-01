@@ -1,49 +1,67 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-dawn2
-PKG_VERSION:=1.0
+PKG_VERSION:=1.0.0
 PKG_RELEASE:=1
 
-LUCI_TITLE:=LuCI interface for DAWN2
-LUCI_PKGCAPTION:=LuCI interface for DAWN2
-LUCI_DEPENDS:=+dawn2
+PKG_LICENSE:=GPLv3
+PKG_MAINTAINER:=brudalevante
+
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+
+include $(INCLUDE_DIR)/package.mk
 
 define Package/$(PKG_NAME)
-  SECTION:=luci
-  CATEGORY:=LuCI
-  SUBMENU:=3. Applications
-  TITLE:=$(LUCI_TITLE)
-  DEPENDS:=$(LUCI_DEPENDS)
+  CATEGORY:=Network
+  SUBMENU:=Mesh
+  TITLE:=LuCI Support for dawn2
+  PKGARCH:=all
+  DEPENDS:=+jsonfilter +umdns +firewall4
+endef
+
+define Package/$(PKG_NAME)/description
+LuCI Support for dawn2.
+endef
+
+define Build/Prepare
+	$(foreach po,$(wildcard $(CURDIR)/po/es/*.po), \
+		po2lmo $(po) $(PKG_BUILD_DIR)/$(patsubst %.po,%.lmo,$(notdir $(po)));)
+endef
+
+define Build/Configure
+endef
+
+define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-	# Binario DAWN2
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) ./files/usr/sbin/dawn2 $(1)/usr/sbin/dawn2
+	# Traducción LMO
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.lmo $(1)/usr/lib/lua/luci/i18n/
 
-	# JS principal
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn2
-	$(INSTALL_DATA) ./htdocs/luci-static/resources/dawn2/dawn2-common.js $(1)/www/luci-static/resources/dawn2/dawn2-common.js
-
-	# Vistas JS
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/network
-	$(INSTALL_DATA) ./htdocs/luci-static/resources/view/network/dawn2.js $(1)/www/luci-static/resources/view/network/dawn2.js
-
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/status/dawn2
-	$(INSTALL_DATA) ./htdocs/luci-static/resources/view/status/dawn2/hearing_map.js $(1)/www/luci-static/resources/view/status/dawn2/hearing_map.js
-	$(INSTALL_DATA) ./htdocs/luci-static/resources/view/status/dawn2/network_overview.js $(1)/www/luci-static/resources/view/status/dawn2/network_overview.js
+	# Controlador LuCI
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
+	$(INSTALL_DATA) $(CURDIR)/usr/lib/lua/luci/controller/dawn2.lua $(1)/usr/lib/lua/luci/controller/dawn2.lua
 
 	# Menú LuCI
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	$(INSTALL_DATA) ./root/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
+	$(INSTALL_DATA) $(CURDIR)/root/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
 
 	# Permisos RPCD
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(INSTALL_DATA) ./root/luci/rpcd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
+	$(INSTALL_DATA) $(CURDIR)/root/luci/rcpd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
 
-	# Archivo de configuración por defecto
+	# JS principal
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
+	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/dawn/dawn2-common.js $(1)/www/luci-static/resources/dawn/dawn2-common.js
+
+	# Vistas JS
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
+	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/dawn2/dawn2.js $(1)/www/luci-static/resources/view/dawn2/dawn2.js
+
+	# Instala el archivo de configuración por defecto
 	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_CONF) ./etc/config/dawn2 $(1)/etc/config/dawn2
+	$(INSTALL_CONF) $(CURDIR)/etc/config/dawn2 $(1)/etc/config/dawn2
 endef
 
 define Package/$(PKG_NAME)/conffiles
