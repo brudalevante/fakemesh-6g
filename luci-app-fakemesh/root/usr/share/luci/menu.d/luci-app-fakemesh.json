@@ -35,11 +35,11 @@
     }
   },
   "admin/mesh/usteer": {
-    "title": "Usteer",
+    "title": "Usteer2",
     "order": 3,
     "action": {
       "type": "view",
-      "path": "usteer/usteer"
+      "path": "usteer2/usteer2"
     },
     "depends": {
       "acl": [ "luci-app-usteer" ],
