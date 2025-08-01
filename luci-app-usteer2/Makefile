@@ -33,6 +33,10 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
+	# Instala el binario usteer2
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(CURDIR)/files/usr/sbin/usteer2 $(1)/usr/sbin/usteer2
+
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DATA) $(CURDIR)/usr/lib/lua/luci/controller/usteer2.lua $(1)/usr/lib/lua/luci/controller/usteer2.lua
 
