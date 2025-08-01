@@ -22,19 +22,19 @@
       "uci": { "fakemesh": true }
     }
   },
-  "admin/mesh/dawn": {
-    "title": "DAWN",
+  "admin/mesh/dawn2": {
+    "title": "DAWN2",
     "order": 2,
     "action": {
       "type": "view",
       "path": "status/dawn/hearing_map"
     },
     "depends": {
-      "acl": [ "luci-app-dawn" ],
+      "acl": [ "luci-app-dawn2" ],
       "uci": { "dawn": true }
     }
   },
-  "admin/mesh/usteer": {
+  "admin/mesh/usteer2": {
     "title": "Usteer2",
     "order": 3,
     "action": {
@@ -42,7 +42,7 @@
       "path": "usteer2/usteer2"
     },
     "depends": {
-      "acl": [ "luci-app-usteer" ],
+      "acl": [ "luci-app-usteer2" ],
       "uci": { "usteer": true }
     }
   }
