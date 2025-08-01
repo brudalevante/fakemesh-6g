@@ -74,8 +74,8 @@ endef
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
-/etc/init.d/dawn2 enable
-/etc/init.d/dawn2 start
+/etc/init.d/dawn enable
+/etc/init.d/dawn start
 exit 0
 endef
 
