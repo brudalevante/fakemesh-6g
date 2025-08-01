@@ -23,11 +23,6 @@ define Package/$(PKG_NAME)/description
 LuCI Support for dawn2.
 endef
 
-define Build/Prepare
-	$(foreach po,$(wildcard $(CURDIR)/po/es/*.po), \
-		po2lmo $(po) $(PKG_BUILD_DIR)/$(patsubst %.po,%.lmo,$(notdir $(po)));)
-endef
-
 define Build/Configure
 endef
 
@@ -35,10 +30,6 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-	# Traducción LMO
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/dawn2.lmo $(1)/usr/lib/lua/luci/i18n/
-
 	# Controlador LuCI
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DATA) $(CURDIR)/usr/lib/lua/luci/controller/dawn2.lua $(1)/usr/lib/lua/luci/controller/dawn2.lua
