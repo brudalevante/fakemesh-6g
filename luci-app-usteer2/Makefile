@@ -64,8 +64,8 @@ endef
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
-/etc/init.d/usteer2 enable
-/etc/init.d/usteer2 start
+/etc/init.d/usteer enable
+/etc/init.d/usteer start
 exit 0
 endef
 
