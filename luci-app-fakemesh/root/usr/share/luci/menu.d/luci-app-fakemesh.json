@@ -27,7 +27,7 @@
     "order": 2,
     "action": {
       "type": "view",
-      "path": "dawn/dawn"
+      "path": "status/dawn/hearing_map"
     },
     "depends": {
       "acl": [ "luci-app-dawn" ],
