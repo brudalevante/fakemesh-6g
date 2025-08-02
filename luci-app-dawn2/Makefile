@@ -30,25 +30,25 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-	# Controlador LuCI
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_DATA) $(CURDIR)/usr/lib/lua/luci/controller/dawn2.lua $(1)/usr/lib/lua/luci/controller/dawn2.lua
-
 	# Menú LuCI
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	$(INSTALL_DATA) $(CURDIR)/root/luci/menu.d/luci-app-dawn2.json $(1)/usr/share/luci/menu.d/luci-app-dawn2.json
+	$(INSTALL_DATA) $(CURDIR)/root/luci/menu.d/luci-app-dawn.json $(1)/usr/share/luci/menu.d/luci-app-dawn.json
 
 	# Permisos RPCD
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(INSTALL_DATA) $(CURDIR)/root/luci/rcpd/acl.d/luci-app-dawn2.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn2.json
+	$(INSTALL_DATA) $(CURDIR)/root/luci/rcpd/acl.d/luci-app-dawn.json $(1)/usr/share/rpcd/acl.d/luci-app-dawn.json
 
 	# JS principal
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
-	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/dawn/dawn2-common.js $(1)/www/luci-static/resources/dawn/dawn2-common.js
+	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/dawn/dawn-common.js $(1)/www/luci-static/resources/dawn/dawn-common.js
 
 	# Vistas JS
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/dawn2
-	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/dawn2/dawn2.js $(1)/www/luci-static/resources/view/dawn2/dawn2.js
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/network
+	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/network/dawn.js $(1)/www/luci-static/resources/view/network/dawn.js
+
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/status
+	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/status/hearing_map.js $(1)/www/luci-static/resources/view/status/hearing_map.js
+	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/status/network_overview.js $(1)/www/luci-static/resources/view/status/network_overview.js
 
 	# Instala el archivo de configuración por defecto
 	$(INSTALL_DIR) $(1)/etc/config
