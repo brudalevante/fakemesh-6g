@@ -51,4 +51,8 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/status/network_overview.js $(1)/www/luci-static/resources/view/status/network_overview.js
 endef
 
+<<<<<<< HEAD
 $(eval $(call BuildPackage,$(PKG_NAME)))
+=======
+$(eval $(call BuildPackage,$(PKG_NAME)))
+>>>>>>> 6b6a9bb1 (Añadidos y renombrados paquetes luci-app-dawn2 -luci-app-usteer2)
