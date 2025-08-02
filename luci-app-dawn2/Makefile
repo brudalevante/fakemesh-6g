@@ -42,10 +42,11 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/dawn
 	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/dawn/dawn-common.js $(1)/www/luci-static/resources/dawn/dawn-common.js
 
-	# Vistas JS
+	# Vistas JS - network
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/network
 	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/network/dawn.js $(1)/www/luci-static/resources/view/network/dawn.js
 
+	# Vistas JS - status
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/status
 	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/status/hearing_map.js $(1)/www/luci-static/resources/view/status/hearing_map.js
 	$(INSTALL_DATA) $(CURDIR)/htdocs/luci-static/resources/view/status/network_overview.js $(1)/www/luci-static/resources/view/status/network_overview.js
