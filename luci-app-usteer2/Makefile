@@ -33,9 +33,9 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-	# Instala el binario usteer2 (solo si tu app lo incluye, si no, elimina estas dos líneas)
+	# Instala el binario usteer2
 	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(CURDIR)/files/usr/sbin/usteer2 $(1)/usr/sbin/usteer2
+	$(INSTALL_BIN) $(CURDIR)/usr/sbin/usteer2 $(1)/usr/sbin/usteer2
 
 	# LuCI controller
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
