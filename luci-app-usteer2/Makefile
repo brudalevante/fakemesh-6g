@@ -23,9 +23,6 @@ define Package/$(PKG_NAME)/description
 LuCI Support for usteer2.
 endef
 
-define Build/Prepare
-endef
-
 define Build/Configure
 endef
 
@@ -33,11 +30,11 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-	# Instala el binario usteer2
+	# Binario usteer2
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(CURDIR)/usr/sbin/usteer2 $(1)/usr/sbin/usteer2
 
-	# LuCI controller
+	# Controlador Lua
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DATA) $(CURDIR)/usr/lib/lua/luci/controller/usteer2.lua $(1)/usr/lib/lua/luci/controller/usteer2.lua
 
@@ -49,7 +46,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) $(CURDIR)/usr/share/rpcd/acl.d/luci-app-usteer2.json $(1)/usr/share/rpcd/acl.d/luci-app-usteer2.json
 
-	# Frontend JS
+	# Vista JS
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/usteer2
 	$(INSTALL_DATA) $(CURDIR)/www/luci-static/resources/view/usteer2/usteer2.js $(1)/www/luci-static/resources/view/usteer2/usteer2.js
 endef
