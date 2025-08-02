@@ -16,7 +16,7 @@ define Package/$(PKG_NAME)
   SUBMENU:=Mesh
   TITLE:=LuCI Support for usteer2
   PKGARCH:=all
-  DEPENDS:=+jsonfilter +umdns +firewall4
+  DEPENDS:=+jsonfilter +umdns +firewall4 +libnl-tiny
 endef
 
 define Package/$(PKG_NAME)/description
