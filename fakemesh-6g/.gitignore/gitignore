@@ -1,0 +1,30 @@
+# Ignora ejecutables y binarios
+*.exe
+*.msi
+*.bin
+*.img
+*.iso
+*.zip
+*.7z
+*.tar
+*.gz
+*.rar
+*.dmg
+
+# Ignora PDFs y documentos
+*.pdf
+*.docx
+*.doc
+*.xlsx
+*.xls
+
+# Ignora imágenes personales pesadas
+*.jpg
+*.jpeg
+*.png
+*.gif
+
+# Ignora carpetas y archivos del sistema
+.DS_Store
+Thumbs.db
+*.log
