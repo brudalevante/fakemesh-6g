@@ -1,7 +1,0 @@
- Paso 2: Conexión Segura con Mullvad VPN
-Conéctate a un servidor en Suecia o Suiza (Mullvad tiene mejor rendimiento allí).
-
-Descarga directa via HTTP (solo con VPN activa):
-
-bash
-wget --no-check-certificate https://secure.openwrt-be7000.eu/BE7000-STABLE-v1.0.bin  
