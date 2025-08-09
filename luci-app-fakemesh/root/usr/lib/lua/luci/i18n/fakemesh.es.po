@@ -1,47 +1,53 @@
-msgid "Basic settings for your fake mesh overlay network"
-msgstr "Configuración básica para tu red de malla fake mesh"
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "This section contains no values yet"
-msgstr "Esta sección aún no contiene valores"
+msgid "Fake Mesh Setup"
+msgstr "Configuración Fake Mesh"
 
-msgid "Enable"
-msgstr "Activar"
+msgid "Fake Mesh"
+msgstr "Malla Fake Mesh"
 
-msgid "Mesh ID"
-msgstr "ID de malla"
+msgid "Role"
+msgstr "Rol"
 
-msgid "Key"
-msgstr "Clave"
+msgid "Leave empty if encryption is not required."
+msgstr "Déjalo vacío si no se requiere cifrado."
 
-msgid "Band"
-msgstr "Banda"
+msgid "Set the gateway router as controller, others as agent."
+msgstr "Establece el router principal como controlador, los demás como agentes."
 
-msgid "Encryption"
-msgstr "Cifrado"
+msgid "Wired AP (ethernet as backhaul)"
+msgstr "AP cableado (Ethernet como backhaul)"
 
-msgid "SSID"
-msgstr "ESSID"
+msgid "Agent (wifi as backhaul)"
+msgstr "Agente (WiFi como backhaul)"
 
-msgid "Enable"
-msgstr "Activar"
+msgid "Controller (AC)"
+msgstr "Controlador (AC)"
 
-msgid "Key"
-msgstr "Clave"
+msgid "The simple ip address to access the controller."
+msgstr "La dirección IP para acceder al controlador."
 
-msgid "Band"
-msgstr "Banda"
+msgid "Access IP address"
+msgstr "Dirección IP de acceso"
 
-msgid "Enable"
-msgstr "Activar"
+msgid "Sync Config"
+msgstr "Sincronizar configuración"
 
-msgid "The section below contains configuration options for the wireless mesh network."
-msgstr "La sección de abajo contiene opciones de configuración para la red de malla inalámbrica."
+msgid "Sync config from the Controller."
+msgstr "Sincronizar la configuración desde el controlador."
 
-msgid "No password set!"
-msgstr "¡Sin contraseña!"
+msgid "Wireless Management"
+msgstr "Gestión inalámbrica"
 
-msgid "There is no password set on this router. Please configure a root password to protect the web interface."
-msgstr "No hay ninguna contraseña establecida en este enrutador. Configure una contraseña de root para proteger la interfaz web."
+msgid "Not available on AP"
+msgstr "No disponible en el AP"
 
-msgid "Go to password configuration..."
-msgstr "Ir a la configuración de la contraseña..."
+msgid "Band Steer Helper"
+msgstr "Asistente de cambio de banda"
+
+msgid "Fronthaul Disabled"
+msgstr "Desactivar la señal principal (fronthaul)"
+
+msgid "Disable fronthaul Wi-Fi signal on this node."
+msgstr "Deshabilitar la señal Wi-Fi fronthaul en este nodo."
