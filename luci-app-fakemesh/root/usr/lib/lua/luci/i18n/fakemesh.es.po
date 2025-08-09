@@ -1,0 +1,47 @@
+msgid "Basic settings for your fake mesh overlay network"
+msgstr "Configuración básica para tu red de malla fake mesh"
+
+msgid "This section contains no values yet"
+msgstr "Esta sección aún no contiene valores"
+
+msgid "Enable"
+msgstr "Activar"
+
+msgid "Mesh ID"
+msgstr "ID de malla"
+
+msgid "Key"
+msgstr "Clave"
+
+msgid "Band"
+msgstr "Banda"
+
+msgid "Encryption"
+msgstr "Cifrado"
+
+msgid "SSID"
+msgstr "ESSID"
+
+msgid "Enable"
+msgstr "Activar"
+
+msgid "Key"
+msgstr "Clave"
+
+msgid "Band"
+msgstr "Banda"
+
+msgid "Enable"
+msgstr "Activar"
+
+msgid "The section below contains configuration options for the wireless mesh network."
+msgstr "La sección de abajo contiene opciones de configuración para la red de malla inalámbrica."
+
+msgid "No password set!"
+msgstr "¡Sin contraseña!"
+
+msgid "There is no password set on this router. Please configure a root password to protect the web interface."
+msgstr "No hay ninguna contraseña establecida en este enrutador. Configure una contraseña de root para proteger la interfaz web."
+
+msgid "Go to password configuration..."
+msgstr "Ir a la configuración de la contraseña..."
