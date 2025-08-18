@@ -3,12 +3,10 @@ config fakemesh 'default'
 	option id 'mesh-brudalevante'
 	option key '12345678'
 	option band '6g'
-	ooption role 'agent'
+	option role 'agent'
 	option band_steer_helper 'none'
 	option fronthaul_disabled '0'
 	option init '1'
-
-
 
 config wifim
 	option ssid 'brudalevante'
