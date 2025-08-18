@@ -11,6 +11,6 @@ config fakemesh 'default'
 config wifim
 	option ssid 'brudalevante'
 	option encryption 'sae'
-	option key '88888888'
+	option key '12345678'
 	option band '2g5g6g'
 	option cfg_version '1'
