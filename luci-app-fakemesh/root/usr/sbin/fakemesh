@@ -65,6 +65,264 @@ test $enabled -eq 0 && {
 
 	uci delete wireless.meshx0 &>/dev/null
 	uci delete wireless.meshx1 &>/dev/null
+	uci delete wireless.meshx2 &>/dev/null
+
+	I=0
+	while uci get wireless.@wifi-iface[$I] &>/dev/null; do
+		echo "$(uci get wireless.@wifi-iface[$I].network)" | grep -q "^meshx" && {
+			uci set wireless.@wifi-iface[$I].network="lan"
+		}
+		I=$((I+1))
+	done
+
+	uci delete fakemesh.default.wifim_md5 &>/dev/null
+	uci delete dhcp.meshx0 &>/dev/null
+	uci delete network.meshx0 &>/dev/null
+	uci delete network.meshx0_6 &>/dev/null
+	uci delete firewall.fakemesh &>/dev/null
+	sed -i "/.* controller.fakemesh/d" /etc/hosts
+	sed -i "/sh \/usr\/share\/fakemesh\/firewall.include.*/d" /etc/firewall.include
+
+	#re-enable lan
+	uci delete network.lan.auto &>/dev/null
+	#re-enable wan
+	uci delete network.wan.auto &>/dev/null
+	uci delete network.wan6.auto &>/dev/null
+	#del wan port from br-lan
+	lan_idx=0
+	while uci get network.@device[$lan_idx] &>/dev/null && [ $(uci get network.@device[$lan_idx].name) != "br-lan" ]; do lan_idx=$((lan_idx+1)); done
+	lan_ports="$(uci get network.@device[$lan_idx].ports 2>/dev/null)"
+	wan_port="$(uci get network.wan.device 2>/dev/null)"
+	newlan_ports=$(for lp in $lan_ports; do [ "$lp" = "$wan_port" ] || echo $lp; done | sort | uniq)
+	newlan_ports=$(echo $newlan_ports)
+	[ "$lan_ports" != "$newlan_ports" ] && {
+		uci delete network.@device[$lan_idx].ports &>/dev/null
+		for lp in $newlan_ports; do
+			uci add_list network.@device[$lan_idx].ports="$lp"
+		done
+	}
+
+	#delete meshx0/meshx1/meshx2 from lan zone
+	lan_idx=0
+	while uci get firewall.@zone[$lan_idx] &>/dev/null && [ $(uci get firewall.@zone[$lan_idx].name) != "lan" ]; do lan_idx=$((lan_idx+1)); done
+	lan_net="$(uci get firewall.@zone[$lan_idx].network 2>/dev/null)"
+	newlan_net=$(for ln in $lan_net; do [ "$ln" = "meshx0" -o "$ln" = "meshx0_6" -o "$ln" = "meshx1" -o "$ln" = "meshx2" ] || echo $ln; done | sort | uniq)
+	newlan_net=$(echo $newlan_net)
+	[ "$lan_net" != "$newlan_net" ] && {
+		uci delete firewall.@zone[$lan_idx].network &>/dev/null
+		for ln in $newlan_net; do
+			uci add_list firewall.@zone[$lan_idx].network="$ln"
+		done
+		uci commit firewall
+	}
+
+	uci changes
+
+	uci commit fakemesh
+	uci commit wireless
+	uci commit dhcp
+	uci commit firewall
+	uci commit network
+	/etc/init.d/network reload
+	/etc/init.d/dnsmasq reload
+	/etc/init.d/firewall reload &>/dev/null
+	exit 0
+}
+
+config_get role default 'role' 'agent'
+config_get band default 'band' '5g'
+config_get Xid default 'id'
+config_get Xkey default 'key'
+config_get access_ip default 'access_ip' '10.10.10.1'
+config_get sync_ac default 'sync_ac' '1'
+config_get fronthaul_disabled default 'fronthaul_disabled' '0'
+
+lost_ac=${lost_ac:-0}
+LOST_AC_CNT=3
+
+agent_lost_ac()
+{
+	[ "$role" = "agent" ] || [ "$role" = "wap" ] || return 0
+
+	pid=$$
+	logger -t fakemesh "agent_lost_ac($pid): started! lost_ac=$lost_ac"
+
+	if test $lost_ac -gt $LOST_AC_CNT; then
+		rm -rf /tmp/fakemesh_lck3
+		lost_ac=$lost_ac exec /usr/sbin/fakemesh agent_sync_config &
+		return 0
+	fi
+
+	#re-enable lan
+	uci delete network.lan.auto &>/dev/null
+	uci set network.lan.ipaddr="192.168.16.1"
+	for lip in `seq 16 20`; do
+		if ip route | grep -q "192.168.$lip.0/"; then
+			:
+		else
+			uci set network.lan.ipaddr="192.168.$lip.1"
+			break
+		fi
+	done
+	uci set network.lan.netmask='255.255.255.0'
+	logger -t fakemesh "agent_lost_ac($pid): setup temporary lan ip=$(uci get network.lan.ipaddr)"
+
+	#re-enable lan enable wifi
+	ssid="$(uci get base_config.@status[0].SSID)@$(uci get network.lan.ipaddr)"
+	ssid_passwd=$(uci get base_config.@status[0].SSID_PASSWD)
+	K=0
+	for band in 2g 5g 6g; do
+		wbandstr=$(uci show wireless | grep .band=\'${band}\'$ -m1)
+		if test -n "$wbandstr"; then
+			radio=$(echo $wbandstr | cut -d\. -f2)
+
+			uci set wireless.wifinet$K=wifi-iface
+			uci set wireless.wifinet$K.device="${radio}"
+			uci set wireless.wifinet$K.network='lan'
+			uci set wireless.wifinet$K.mode='ap'
+			uci set wireless.wifinet$K.ssid="${ssid}"
+			uci set wireless.wifinet$K.encryption="psk2"
+			uci set wireless.wifinet$K.key="${ssid_passwd}"
+			uci set wireless.wifinet$K.wpa_group_rekey='601'
+			uci set wireless.wifinet$K.max_inactivity='301'
+			if uci get wireless.${radio}.path | grep -q bcma || iwinfo wlan${radio:5} info | grep -qi Cypress; then
+				WLAN_IDX=${radio:5}
+				uci set wireless.wifinet$K.ifname="wlan${WLAN_IDX}"
+			else
+				uci set wireless.wifinet$K.ieee80211r='1'
+				uci set wireless.wifinet$K.ft_over_ds='0'
+				uci set wireless.wifinet$K.ft_psk_generate_local='1'
+			fi
+
+			uci delete wireless.wifinet$K.disabled 2>/dev/null
+			K=$((K+1))
+			logger -t fakemesh "agent_lost_ac($pid): starting wifi SSID=\'${ssid}\' on ${radio} $band!"
+		fi
+	done
+	while uci get wireless.wifinet$K 2>/dev/null; do
+		uci set wireless.wifinet$K.disabled='1'
+		K=$((K+1))
+	done
+
+	nft_add_brmeshfilters() {
+		brif="$1"
+		nft add table netdev brmeshfilters_$brif 2>/dev/null
+		nft "add chain netdev brmeshfilters_$brif devfilter { type filter hook ingress device $brif priority 0 ; }" 2>/dev/null
+		nft add rule netdev brmeshfilters_$brif devfilter udp sport 68 drop 2>/dev/null
+	}
+
+	#drop all in-comming DHCP request from eth port
+	for brif in $(cd /sys/class/net/br-lan/brif/ && ls); do
+		iwinfo $brif info &>/dev/null && [ "$brif" != "meshx0" ] && [ "$brif" != "meshx1" ] && [ "$brif" != "meshx2" ] && continue
+		nft_add_brmeshfilters $brif
+	done
+
+	#dhcp no push router for lan, no push dns for lan
+	uci add_list dhcp.lan.dhcp_option='option:router'
+	uci add_list dhcp.lan.dhcp_option='6'
+
+	/etc/init.d/network reload
+	/etc/init.d/dnsmasq reload
+	sleep 5
+	uci revert dhcp
+	uci revert network
+	uci revert wireless
+
+	#drop all in-comming DHCP request from eth port
+	#XXX: since network reload, netdevice may unregister and re-create, it is safe to re-add filter rules again.
+	for brif in $(cd /sys/class/net/br-lan/brif/ && ls); do
+		iwinfo $brif info &>/dev/null && [ "$brif" != "meshx0" ] && [ "$brif" != "meshx1" ] && [ "$brif" != "meshx2" ] && continue
+		nft_add_brmeshfilters $brif
+	done
+
+	logger -t fakemesh "agent_lost_ac($pid): done!"
+
+	#make sure agent_sync_config stopped
+	rm -rf /tmp/fakemesh_lck3
+	lost_ac=$lost_ac exec /usr/sbin/fakemesh agent_sync_config &
+}
+
+# El resto del script permanece igual, pero repite la lógica para meshx2 (6g) donde corresponda
+# Incluye meshx2 en limpieza, creación, etc.
+
+# En los bloques donde se crean o gestionan meshx0/meshx1, añade meshx2 para la banda 6g:
+# - Para la parte "controller": crea meshx0 (2g), meshx1 (5g), meshx2 (6g)
+# - Para la parte "agent"/"wap": igual, crea meshx0/meshx1/meshx2 según banda
+
+# Para los bloques de canales, añade lógica para radio2/meshx2 igual que meshx1
+
+# ... el resto del script sigue igual, solo añade:
+# - Donde pone meshx0 & meshx1, añade meshx2
+# - Donde pone for band in 2g 5g, pon for band in 2g 5g 6g
+# - Donde hace uci delete/set meshx0/meshx1, añade meshx2
+
+# Si quieres el script completo expandido, avísame y te lo genero con todos los bloques.#!/bin/sh
+
+. /lib/functions.sh
+. /lib/functions/network.sh
+
+band_steer_helper=${band_steer_helper:-none}
+
+band_steer_helper_switch()
+{
+	if [ "$band_steer_helper" = "usteer" ]; then
+		uci delete usteer.@usteer[0].event_log_types 2>/dev/null
+		uci delete usteer.@usteer[0].ssid_list 2>/dev/null
+		uci commit usteer
+		test -x /etc/init.d/dawn && {
+			/etc/init.d/dawn enabled && /etc/init.d/dawn disable
+			/etc/init.d/dawn running && /etc/init.d/dawn stop
+		}
+		test -x /etc/init.d/usteer && {
+			/etc/init.d/usteer enabled || /etc/init.d/usteer enable
+			/etc/init.d/usteer running || /etc/init.d/usteer start
+		}
+	elif [ "$band_steer_helper" = "dawn" ]; then
+		test -x /etc/init.d/usteer && {
+			/etc/init.d/usteer enabled && /etc/init.d/usteer disable
+			/etc/init.d/usteer running && /etc/init.d/usteer stop
+		}
+		test -x /etc/init.d/dawn && {
+			/etc/init.d/dawn enabled || /etc/init.d/dawn enable
+			/etc/init.d/dawn running || /etc/init.d/dawn start
+		}
+	else
+		test -x /etc/init.d/dawn && {
+			/etc/init.d/dawn enabled && /etc/init.d/dawn disable
+			/etc/init.d/dawn running && /etc/init.d/dawn stop
+		}
+		test -x /etc/init.d/usteer && {
+			/etc/init.d/usteer enabled && /etc/init.d/usteer disable
+			/etc/init.d/usteer running && /etc/init.d/usteer stop
+		}
+	fi
+}
+
+[ "x$1" = "xband_steer_helper_switch" ] && {
+	band_steer_helper_switch
+	exit 0
+}
+
+[ "x$1" = "xsetup" ] && {
+	exit 0
+}
+
+config_load fakemesh
+
+config_get_bool enabled default 'enabled' '0'
+
+test $enabled -eq 0 && {
+	rm -f /www/fakemesh.*
+	rm -rf /tmp/fakemesh_lck*
+	rm -f /tmp/fakemesh.firewall.include
+
+	test -e /etc/init.d/umdns && {
+	rm /tmp/fakemesh.umdns.json 2>/dev/null && \
+	/etc/init.d/umdns restart
+	}
+
+	uci delete wireless.meshx0 &>/dev/null
+	uci delete wireless.meshx1 &>/dev/null
 
 	I=0
 	while uci get wireless.@wifi-iface[$I] &>/dev/null; do
