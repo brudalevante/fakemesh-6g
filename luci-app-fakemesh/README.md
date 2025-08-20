@@ -1,86 +1,76 @@
-## fakemesh简介
+## Descripción de fakemesh
 
-fakemesh是一种网络拓扑结构，由一个`控制器（AC）`和一个或多个`有线AP（Wired AP）`和`卫星（Agent）`组成。它是一种混合了`无线Mesh`和`AC+AP`两种组网模式的混合网络，其中，`有线AP`通过网线和`控制器（AC）`相连，而`卫星（Agent）`则通过无线STA方式接入，共同构成一个无线（包括有线）覆盖网络。
+fakemesh es una arquitectura de red compuesta por un `controlador (AC)`, uno o varios `AP cableados (Wired AP)` y `satélites (Agent)`. Es una red híbrida que combina los modos de despliegue `Mesh inalámbrico` y `AC+AP`. Los `AP cableados` se conectan al controlador mediante cable Ethernet, mientras que los `satélites (Agent)` se conectan de forma inalámbrica como estaciones (STA), formando juntos una red de cobertura combinada (inalámbrica y cableada).
 
-fakemesh的部署确实相对较为方便，只需要将节点设备连接到正确的网络，并设置节点设备的角色，Mesh ID等信息即可。因为fakemesh结合了无线Mesh和AC+AP两种组网模式，所以也可以很方便地进行混合组网，提高了网络的覆盖范围和可靠性。
+La implementación de fakemesh es bastante sencilla: solo debes conectar los dispositivos a la red correspondiente y configurar el rol, el Mesh ID y otros parámetros. Dado que fakemesh permite la combinación de topologías Mesh y AC+AP, el despliegue mixto es fácil y proporciona mayor cobertura y fiabilidad.
 
-目前[X-WRT](https://github.com/x-wrt/x-wrt)默认集成了fakemesh功能
+Actualmente, [XGS-PONT-2-ESPEJO](https://github.com/brudalevante/xgs-pont-2-espejo.git) integra fakemesh por defecto.
 
-## fakemesh 使用
+## Uso de fakemesh
 
-### 组网成功后统一的访问设备的地址格式如下:
+### Una vez desplegada la red, las direcciones de acceso son:
 
-访问控制器的地址: `http://controller.fakemesh/`或者`http://ac.fakemesh/`
+- Para acceder al controlador: `http://controller.fakemesh/` o `http://ac.fakemesh/`
+- Para acceder a un AP: `http://{mac}.ap.fakemesh/` o `http://N.ap.fakemesh/`
 
-访问AP的地址: `http://{mac}.ap.fakemesh/` 或者 `http://N.ap.fakemesh/`
+Donde `{mac}` es la dirección MAC del AP (por ejemplo, `1122334455AB`), y `N` es el número automático asignado al AP (N=1, N=2, ...).
 
-其中`{mac}`是AP的MAC地址，比如`{mac}=1122334455AB`，`N`是AP的自动编号，比如 N=1, N=2, N=3, ...
-
-例子:
+Ejemplos:
 ```
 http://1.ap.fakemesh/
 http://1122334455AB.ap.fakemesh/
 ```
 
-### 故障处理:
+### Modo de Recuperación
 
-AP离线3分钟左右进入故障模式，这个模式开启默认SSID，可以提供接入管理重新配置。
-故障模式的默认SSID和密码是:
+Si un AP queda offline durante unos 3 minutos, entra en modo de recuperación, activando un SSID por defecto para permitir la reconfiguración.
+
+SSID y contraseña predeterminados:
 ```
 SSID: X-WRT_XXXX
 PASSWD: 88888888
 ```
 
-故障模式下AP的管理IP地址是DHCP的网关地址，比如电脑获取到`192.168.16.x`的IP，那么AP的管理IP就是`192.168.16.1`
+En modo recuperación, la IP de gestión del AP será la dirección de puerta de enlace DHCP. Si tu PC obtiene la IP `192.168.16.x`, la gestión será en `192.168.16.1`.
 
-## fakemesh 基本组成
+## Componentes de fakemesh
 
-组网由一个`控制器(controller)`和一个或者多个`AP`组成
+La red está formada por un `controlador (controller)` y uno o varios AP:
 
-AP包括: `卫星(Agent)`和`有线AP(Wired AP)`两种
+- **Controlador (Controller)**: Actúa como AC y gateway principal, gestiona los AP cableados y satélites, y administra la red inalámbrica.
+- **Satélite (Agent)**: AP conectado vía Wi-Fi.
+- **AP cableado (Wired AP)**: AP conectado vía cable Ethernet.
 
-**控制器(Controller)**:  作为AC和出口路由器，提供网络出口上网，统一管理下挂的卫星和有线AP，统一管理无线
+## Parámetros de configuración de fakemesh
 
-**卫星(Agent)**:  通过Wi-Fi组网接入的AP
+1. **Mesh ID**  
+   ID común para todos los nodos de la red fakemesh.
 
-**有线AP(Wired AP)**:  通过网线组网接入的AP
+2. **Clave (Key)**  
+   Clave unificada para la red. Se puede dejar en blanco si no se desea cifrado.
 
-## fakemesh 配置参数
+3. **Banda (Band)**  
+   Banda de operación del Wi-Fi (2G o 5G, debe coincidir en todos los nodos).
 
-### 1. Mesh ID
+4. **Rol (Role)**  
+   Define si el nodo es controlador, satélite o AP cableado.
 
-   这个参数是fakemesh网络组网的统一ID，控制器、卫星、有线AP都要设置相同的Mesh ID。
+5. **Sincronizar configuración (Sync Config)**  
+   Permite que el controlador gestione la configuración Wi-Fi de todos los nodos.
 
-### 2. 密钥(Key)
+6. **Dirección IP de acceso (Access IP address)**  
+   IP específica para acceder a la gestión del controlador.
 
-   这是组网的统一密钥，组网加密需要，如果不需要加密可以留空白。
+7. **Deshabilitar fronthaul (Fronthaul Disabled)**  
+   Si está activado, este nodo no permitirá que otros AP se conecten a través de su Wi-Fi.
 
-### 3. 带宽(Band)
+8. **Asistente de roaming (Band Steer Helper)**  
+   Se puede elegir [DAWN](https://github.com/fakemesh/dawn) o [usteer](https://github.com/fakemesh/usteer) como asistentes de roaming.
 
-   这是组网使用的无线频段，要设置相同，5G或者2G。
+## Gestión inalámbrica
 
-### 4. 角色(Role)
+La gestión de SSID, cifrado, y ancho de banda se puede realizar desde la interfaz del controlador.
 
-   可以是控制器、卫星、有线AP。
+## Despliegue del controlador en modo “bypass” (no gateway)
 
-### 5. 同步配置(Sync Config)
-
-   是否统一管理Wi-Fi配置等，Wi-Fi配置由控制器统一配置管理。
-
-### 6. 访问 IP 地址(Access IP address)
-
-   设置一个特定的IP地址给控制器，可以通过这个IP访问控制器的管理界面。
-
-### 7. 关闭前传(Fronthaul Disabled)
-   这个节点关闭前传无线信号，也就是不允许其他AP节点通过这个节点Wi-Fi接入。
-
-### 8. 漫游组件(Band Steer Helper)
-   目前可以选择[DAWN](https://github.com/fakemesh/dawn)或者[usteer](https://github.com/fakemesh/usteer)作为漫游辅助控件。
-
-## 无线管理(Wireless Management)
-
-   可以在控制器界面上统一管理无线，包括增删SSID，设置SSID的加密方式，频宽。
-
-## 控制器(Controller)旁路部署
-
-   需要注意的是，如果控制器不作为网关出口并且不提供DHCP服务，用户需要手动配置网络设置，包括设置控制器的LAN口IP地址、网关IP和DNS。此外，通常控制器的LAN口会默认启用DHCP客户端，从第三方网关获取IP和网关，如果需要使用静态IP，则需要保证控制器和第三方网关在同一个网段且可以相互通信。否则，就无法实现控制器与其他AP的同步配置。
+Si el controlador no funciona como gateway ni proporciona DHCP, deberás configurar manualmente la IP LAN, puerta de enlace y DNS. Por defecto, el controlador intentará obtener IP por DHCP. Si usas IP estática, asegúrate de que esté en la misma subred que el gateway y que haya comunicación entre ambos, de lo contrario, no podrá sincronizar la configuración con los AP.
