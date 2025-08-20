@@ -110,7 +110,7 @@ SSID: mesh-brudalevante
 PASSWD: 12345678
 ```
 
-In recovery mode, the AP's management IP address is the DHCP gateway. For example, if your computer receives `192.168.16.x` as its IP, then the AP's management IP is `192.168.16.1`.
+In recovery mode, the AP's management IP address is the DHCP gateway. For example, if your computer receives `192.168.1.x` as its IP, then the AP's management IP is `192.168.1.1`.
 
 ## fakemesh Components
 
