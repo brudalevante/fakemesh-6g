@@ -106,7 +106,7 @@ If an AP is offline for about 3 minutes, it enters recovery mode, which enables 
 
 The default SSID and password in recovery mode are:
 ```
-SSID: X-WRT_XXXX
+SSID: mesh-brudalevante
 PASSWD: 12345678
 ```
 
