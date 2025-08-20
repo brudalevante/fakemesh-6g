@@ -159,15 +159,15 @@ agent_lost_ac()
 	fi
 
 	uci delete network.lan.auto &>/dev/null
-	uci set network.lan.ipaddr="192.168.16.1"
-	for lip in `seq 16 20`; do
-		if ip route | grep -q "192.168.$lip.0/"; then
-			:
-		else
-			uci set network.lan.ipaddr="192.168.$lip.1"
-			break
-		fi
-	done
+	uci set network.lan.ipaddr="192.168.1.1"
+	for lip in $(seq 1 20); do
+    if ip route | grep -q "192.168.1.$lip/"; then
+        :
+    else
+        uci set network.lan.ipaddr="192.168.1.$lip"
+        break
+    fi
+done
 	uci set network.lan.netmask='255.255.255.0'
 	logger -t fakemesh "agent_lost_ac($pid): setup temporary lan ip=$(uci get network.lan.ipaddr)"
 
