@@ -181,7 +181,11 @@ agent_lost_ac()
 			uci set wireless.wifinet$K.network='lan'
 			uci set wireless.wifinet$K.mode='ap'
 			uci set wireless.wifinet$K.ssid="${ssid}"
-			uci set wireless.wifinet$K.encryption="psk2"
+			if [ "$band" = "6g" ]; then
+				uci set wireless.wifinet$K.encryption="sae"
+			else
+				uci set wireless.wifinet$K.encryption="psk2"
+			fi
 			uci set wireless.wifinet$K.key="${ssid_passwd}"
 			uci set wireless.wifinet$K.wpa_group_rekey='601'
 			uci set wireless.wifinet$K.max_inactivity='301'
@@ -387,7 +391,12 @@ agent_sync_config()
 							uci set wireless.wifinet$K.wpa_group_rekey='601'
 							uci set wireless.wifinet$K.max_inactivity='301'
 							if [ "${encryption}" != "none" ]; then
-								uci set wireless.wifinet$K.encryption="${encryption}"
+								# MODIFICACIÓN: Si banda 6g, forzamos SAE
+								if [ "$band" = "6g" ]; then
+									uci set wireless.wifinet$K.encryption="sae"
+								else
+									uci set wireless.wifinet$K.encryption="${encryption}"
+								fi
 								uci set wireless.wifinet$K.key="${key}"
 							else
 								uci set wireless.wifinet$K.encryption='none'
@@ -820,7 +829,7 @@ else
 			uci set wireless.meshx2.wds='1'
 			uci set wireless.meshx2.ssid="${Xid}"
 			if test -n "${Xkey}"; then
-				uci set wireless.meshx2.encryption='psk2'
+				uci set wireless.meshx2.encryption='sae'
 				uci set wireless.meshx2.key="${Xkey}"
 			else
 				uci set wireless.meshx2.encryption='none'
