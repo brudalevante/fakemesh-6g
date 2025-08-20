@@ -1,0 +1,18 @@
+config fakemesh 'default'
+	option enabled '0'
+	option id 'mesh-brudalevante'
+	option key '12345678'
+	option band '6g'
+	option role 'controller'# controller/controller
+	option band_steer_helper 'usteer'
+	option init '1'
+	option enabled '0'
+	option wifim_md5 'e2309b99399931463bb00aa785d96a2d'
+
+
+config wifim
+	option ssid 'Openwrt 6G'
+	option encryption 'sae'
+	option key '12345678'
+	option band '6g'
+	option cfg_version '1'

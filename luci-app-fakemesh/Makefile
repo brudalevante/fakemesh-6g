@@ -52,6 +52,10 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(CURDIR)/root/etc/init.d/fakemesh $(1)/etc/init.d/fakemesh
 
+	# uci-defaults (IMPORTANTE: añade esta línea)
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) $(CURDIR)/root/uci-defaults/* $(1)/etc/uci-defaults/
+
 	# ACLs, menú y ucitrack
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) $(CURDIR)/root/usr/share/rpcd/acl.d/*.json $(1)/usr/share/rpcd/acl.d/
@@ -64,7 +68,7 @@ define Package/$(PKG_NAME)/install
 
 	# JS para LuCI
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/fakemesh
-	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/view/fakemesh/fakemesh.js $(1)/www/luci-static/resources/view/fakemesh/fakemesh.js
+	$(INSTALL_DATA) $(CURDIR)/root/www/luci-static/resources/view/fakemesh/*.js $(1)/www/luci-static/resources/view/fakemesh/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
