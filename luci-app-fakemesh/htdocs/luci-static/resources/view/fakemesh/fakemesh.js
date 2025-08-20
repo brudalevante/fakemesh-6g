@@ -39,7 +39,6 @@ return view.extend({
 		o.password = true;
 		o.datatype = 'wpakey';
 
-		// Soporte para banda 6g en la configuración principal
 		o = s.option(form.ListValue, 'band', _('Band'));
 		o.value('6g', _('6G'));
 		o.value('5g', _('5G'));
@@ -64,9 +63,10 @@ return view.extend({
 		o.default = o.enabled;
 
 		o = s.option(form.ListValue, 'band_steer_helper', _('Band Steer Helper'));
+		o.value('none', _('None'));
 		o.value('usteer', _('usteer'));
 		o.value('dawn', _('DAWN'));
-		o.default = 'usteer';
+		o.default = 'none';
 
 		o = s.option(form.Flag, 'fronthaul_disabled', _('Fronthaul Disabled'), _('Disable fronthaul Wi-Fi signal on this node.'));
 		o.enabled = '1';
@@ -113,7 +113,6 @@ return view.extend({
 		o.datatype = 'wpakey';
 		if (current_role != 'controller') o.readonly = true;
 
-		// Soporte para banda 6g en la gestión de Wi-Fi
 		o = s.option(form.ListValue, 'band', _('Band'));
 		o.value('2g5g6g', _('2G+5G+6G'));
 		o.value('2g5g', _('2G+5G'));
