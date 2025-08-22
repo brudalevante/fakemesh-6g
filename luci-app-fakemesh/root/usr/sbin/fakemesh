@@ -370,9 +370,8 @@ agent_sync_config()
 				bands=$(uci get fakemeshac.@wifim[$J].band)
 				enabled=$(uci get fakemeshac.@wifim[$J].enabled || echo 1)
 
-				[ "$bands" = "2g5g" ] && bands="2g 5g"
 				[ "$bands" = "2g5g6g" ] && bands="2g 5g 6g"
-
+				
 				[ "$enabled" = "1" ] && {
 					for band in $bands; do
 						for wbandstr in $(uci show wireless | grep .band=\'${band}\'$); do
