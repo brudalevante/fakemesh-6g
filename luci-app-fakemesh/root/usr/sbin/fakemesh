@@ -181,7 +181,11 @@ agent_lost_ac()
 			uci set wireless.wifinet$K.network='lan'
 			uci set wireless.wifinet$K.mode='ap'
 			uci set wireless.wifinet$K.ssid="${ssid}"
-			uci set wireless.wifinet$K.encryption="psk2"
+			if [ "$band" = "6g" ]; then
+				uci set wireless.wifinet$K.encryption="sae"
+			else
+				uci set wireless.wifinet$K.encryption="psk2"
+			fi
 			uci set wireless.wifinet$K.key="${ssid_passwd}"
 			uci set wireless.wifinet$K.wpa_group_rekey='601'
 			uci set wireless.wifinet$K.max_inactivity='301'
@@ -387,7 +391,12 @@ agent_sync_config()
 							uci set wireless.wifinet$K.wpa_group_rekey='601'
 							uci set wireless.wifinet$K.max_inactivity='301'
 							if [ "${encryption}" != "none" ]; then
-								uci set wireless.wifinet$K.encryption="${encryption}"
+								# MODIFICACIÓN: Si banda 6g, forzamos SAE
+								if [ "$band" = "6g" ]; then
+									uci set wireless.wifinet$K.encryption="sae"
+								else
+									uci set wireless.wifinet$K.encryption="${encryption}"
+								fi
 								uci set wireless.wifinet$K.key="${key}"
 							else
 								uci set wireless.wifinet$K.encryption='none'
@@ -535,15 +544,16 @@ agent_fix_channel()
 							fi
 						}
 					elif [ "$band" = "6g" ]; then
-						if [ "$htmode" = "HE320" ]; then
-							uci set wireless.${radio}.htmode="HE160"
-						elif [ "$htmode" = "HE160" ]; then
-							uci set wireless.${radio}.htmode="HE80"
-						elif [ "$htmode" = "EHT320" ]; then
-							uci set wireless.${radio}.htmode="EHT160"
-						elif [ "$htmode" = "EHT160" ]; then
-							uci set wireless.${radio}.htmode="EHT80"
-						fi
+   					 	if [ "$htmode" = "HE320" ]; then
+        					uci set wireless.${radio}.htmode="HE160"
+    						elif [ "$htmode" = "HE160" ]; then
+       						 uci set wireless.${radio}.htmode="HE80"
+   					elif [ "$htmode" = "EHT160" ]; then
+       						 uci set wireless.${radio}.htmode="EHT80"
+   						 fi
+   						 # EHT320 se mantiene porque tu hardware lo soporta
+				fi
+
 					fi
 
 					uci commit wireless
@@ -647,7 +657,7 @@ if [ "$role" = "controller" ]; then
 		uci set wireless.meshx0.wpa_group_rekey='601'
 		uci set wireless.meshx0.max_inactivity='301'
 		if test -n "${Xkey}"; then
-			uci set wireless.meshx0.encryption="${encryption:-sae}"
+			uci set wireless.meshx0.encryption='psk2'
 			uci set wireless.meshx0.key="${Xkey}"
 		else
 			uci set wireless.meshx0.encryption='none'
@@ -777,7 +787,7 @@ else
 		uci set wireless.meshx0.wpa_group_rekey='601'
 		uci set wireless.meshx0.max_inactivity='301'
 		if test -n "${Xkey}"; then
-			uci set wireless.meshx0.encryption="${encryption:-sae}"
+			uci set wireless.meshx0.encryption='psk2'
 			uci set wireless.meshx0.key="${Xkey}"
 		else
 			uci set wireless.meshx0.encryption='none'
@@ -797,7 +807,7 @@ else
 		uci set wireless.meshx1.wds='1'
 		uci set wireless.meshx1.ssid="${Xid}"
 		if test -n "${Xkey}"; then
-			uci set wireless.meshx1.encryption="${encryption:-sae}"
+			uci set wireless.meshx1.encryption='psk2'
 			uci set wireless.meshx1.key="${Xkey}"
 		else
 			uci set wireless.meshx1.encryption='none'
@@ -809,18 +819,15 @@ else
 		fi
 
 		#meshx2 (6GHz)
-		wbandstr6g=$(uci show wireless | grep .band=\'6g\'$ -m1)
-		if test -n "$wbandstr6g"; then
-			radio6g=$(echo $wbandstr6g | cut -d\. -f2)
 			uci set wireless.meshx2=wifi-iface
-			uci set wireless.meshx2.device="${radio6g}"
+			uci set wireless.meshx2.device="${radio}"
 			uci set wireless.meshx2.network='meshx0'
 			uci set wireless.meshx2.ifname='meshx2'
 			uci set wireless.meshx2.mode='sta'
 			uci set wireless.meshx2.wds='1'
 			uci set wireless.meshx2.ssid="${Xid}"
 			if test -n "${Xkey}"; then
-				uci set wireless.meshx2.encryption="${encryption:-sae}"
+				uci set wireless.meshx2.encryption='psk2'
 				uci set wireless.meshx2.key="${Xkey}"
 			else
 				uci set wireless.meshx2.encryption='none'
