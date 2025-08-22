@@ -184,7 +184,7 @@ agent_lost_ac()
 			if [ "$band" = "6g" ]; then
 				uci set wireless.wifinet$K.encryption="sae"
 			else
-				uci set wireless.wifinet$K.encryption="psk2"
+				uci set wireless.wifinet$K.encryption="sae"
 			fi
 			uci set wireless.wifinet$K.key="${ssid_passwd}"
 			uci set wireless.wifinet$K.wpa_group_rekey='601'
@@ -656,7 +656,7 @@ if [ "$role" = "controller" ]; then
 		uci set wireless.meshx0.wpa_group_rekey='601'
 		uci set wireless.meshx0.max_inactivity='301'
 		if test -n "${Xkey}"; then
-			uci set wireless.meshx0.encryption='psk2'
+			uci set wireless.meshx0.encryption='sae'
 			uci set wireless.meshx0.key="${Xkey}"
 		else
 			uci set wireless.meshx0.encryption='none'
@@ -786,7 +786,7 @@ else
 		uci set wireless.meshx0.wpa_group_rekey='601'
 		uci set wireless.meshx0.max_inactivity='301'
 		if test -n "${Xkey}"; then
-			uci set wireless.meshx0.encryption='psk2'
+			uci set wireless.meshx0.encryption='sae'
 			uci set wireless.meshx0.key="${Xkey}"
 		else
 			uci set wireless.meshx0.encryption='none'
@@ -806,7 +806,7 @@ else
 		uci set wireless.meshx1.wds='1'
 		uci set wireless.meshx1.ssid="${Xid}"
 		if test -n "${Xkey}"; then
-			uci set wireless.meshx1.encryption='psk2'
+			uci set wireless.meshx1.encryption='sae'
 			uci set wireless.meshx1.key="${Xkey}"
 		else
 			uci set wireless.meshx1.encryption='none'
@@ -826,7 +826,7 @@ else
 			uci set wireless.meshx2.wds='1'
 			uci set wireless.meshx2.ssid="${Xid}"
 			if test -n "${Xkey}"; then
-				uci set wireless.meshx2.encryption='psk2'
+				uci set wireless.meshx2.encryption='sae'
 				uci set wireless.meshx2.key="${Xkey}"
 			else
 				uci set wireless.meshx2.encryption='none'
