@@ -4,7 +4,7 @@ fakemesh es una arquitectura de red compuesta por un `controlador (AC)`, uno o v
 
 La implementación de fakemesh es bastante sencilla: solo debes conectar los dispositivos a la red correspondiente y configurar el rol, el Mesh ID y otros parámetros. Dado que fakemesh permite la combinación de topologías Mesh y AC+AP, el despliegue mixto es fácil y proporciona mayor cobertura y fiabilidad.
 
-Actualmente, [XGS-PONT-2-ESPEJO](https://github.com/brudalevante/xgs-pont-2-espejo.git) integra fakemesh por defecto.
+Actualmente, [XGS-PONT-2](https://github.com/brudalevante/xgs-pont-2.git) integra fakemesh por defecto.
 
 ## Uso de fakemesh
 
@@ -31,7 +31,7 @@ SSID: mesh-brudalevante
 PASSWD: 12345678
 ```
 
-En modo recuperación, la IP de gestión del AP será la dirección de puerta de enlace DHCP. Si tu PC obtiene la IP `192.168.1.x`, la gestión será en `192.168.1.1`.
+En modo recuperación, la IP de gestión del AP será la dirección de puerta de enlace DHCP. Si tu PC obtiene la IP `192.168.16.x`, la gestión será en `192.168.16.1`.
 
 ## Componentes de fakemesh
 
@@ -83,7 +83,7 @@ fakemesh is a network architecture composed of a `controller (AC)`, one or more 
 
 Deploying fakemesh is quite simple: you just need to connect the devices to the correct network and set the node's role, Mesh ID, and other information. Since fakemesh merges wireless Mesh and AC+AP topologies, it is easy to create a hybrid network, improving coverage and reliability.
 
-Currently, [XGS-PONT-2-ESPEJO](https://github.com/brudalevante/xgs-pont-2.git) integrates fakemesh by default.
+Currently, [XGS-PONT-2](https://github.com/brudalevante/xgs-pont-2.git) integrates fakemesh by default.
 
 ## Using fakemesh
 
