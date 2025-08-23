@@ -7,14 +7,14 @@ interface=lan
 enabled="$(uci get fakemesh.default.enabled)"
 role="$(uci get fakemesh.default.role)"
 
-[ "$enabled" = "1" ] && [ "$role" != "controller" ] && interface=meshx0
+[ "$enabled" = "1" ] && [ "$role" != "controller" ] && interface=meshx1
 
 [ "$INTERFACE" = "$interface" ] || exit 0
 
 #change hostname if mesh enabled
 if [ "$enabled" = "1" ]; then
 	old_hostname="$(uci get system.@system[0].hostname || echoBrudalevante)"
-	new_hostname="$(uci get network.meshx0.hostname || echo $old_hostname)"
+	new_hostname="$(uci get network.meshx1.hostname || echo $old_hostname)"
 	[ "$old_hostname" != "$new_hostname" ] && {
 		uci set system.@system[0].hostname="$new_hostname"
 		uci commit system
@@ -27,9 +27,9 @@ band_steer_helper="$band_steer_helper" /usr/sbin/fakemesh band_steer_helper_swit
 
 /etc/init.d/umdns enabled && {
 
-[ "$interface" = "meshx0" ] && uci get umdns.@umdns[0] && {
+[ "$interface" = "meshx1" ] && uci get umdns.@umdns[0] && {
 	old_net=$(uci get umdns.@umdns[0].network)
-	new_net=$(for net in $old_net meshx0; do echo $net; done | sort | uniq)
+	new_net=$(for net in $old_net meshx1; do echo $net; done | sort | uniq)
 	new_net=$(echo $new_net)
 #FIXME: since umdns bug, this just an workaroud only
 	new_net="meshx0"
