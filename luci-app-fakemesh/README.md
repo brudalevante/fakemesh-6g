@@ -50,7 +50,7 @@ La red está formada por un `controlador (controller)` y uno o varios AP:
    Clave unificada para la red. Se puede dejar en blanco si no se desea cifrado.
 
 3. **Banda (Band)**  
-   Banda de operación del Wi-Fi (2G o 5G, debe coincidir en todos los nodos).
+   Banda de operación del Wi-Fi (5G o 6G, debe coincidir en todos los nodos).
 
 4. **Rol (Role)**  
    Define si el nodo es controlador, satélite o AP cableado.
@@ -83,7 +83,7 @@ fakemesh is a network architecture composed of a `controller (AC)`, one or more 
 
 Deploying fakemesh is quite simple: you just need to connect the devices to the correct network and set the node's role, Mesh ID, and other information. Since fakemesh merges wireless Mesh and AC+AP topologies, it is easy to create a hybrid network, improving coverage and reliability.
 
-Currently, [XGS-PONT-2-ESPEJO](https://github.com/brudalevante/xgs-pont-2-espejo.git) integrates fakemesh by default.
+Currently, [XGS-PONT-2-ESPEJO](https://github.com/brudalevante/xgs-pont-2.git) integrates fakemesh by default.
 
 ## Using fakemesh
 
@@ -110,7 +110,7 @@ SSID: mesh-brudalevante
 PASSWD: 12345678
 ```
 
-In recovery mode, the AP's management IP address is the DHCP gateway. For example, if your computer receives `192.168.1.x` as its IP, then the AP's management IP is `192.168.1.1`.
+In recovery mode, the AP's management IP address is the DHCP gateway. For example, if your computer receives `192.168.16.x` as its IP, then the AP's management IP is `192.168.16.1`.
 
 ## fakemesh Components
 
@@ -131,7 +131,7 @@ APs include: `satellites (Agent)` and `wired APs (Wired AP)`.
    The shared network key. Required for encryption; can be left blank if encryption is not needed.
 
 3. **Band**  
-   The wireless band used for the network; must be the same on all nodes (5G or 2G).
+   The wireless band used for the network; must be the same on all nodes (6G or 5G).
 
 4. **Role**  
    Can be controller, satellite, or wired AP.
