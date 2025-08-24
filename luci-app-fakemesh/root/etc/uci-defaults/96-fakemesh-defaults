@@ -7,7 +7,7 @@ uci get fakemesh.default.init || {
 	uci set fakemesh.@wifim[0].ssid="${ssid}"
 	uci set fakemesh.@wifim[0].encryption='psk2'
 	uci set fakemesh.@wifim[0].key="${ssid_passwd}"
-	uci set fakemesh.@wifim[0].band='2g5g6g'
+	uci set fakemesh.@wifim[0].band='2g5g'
 
 	uci set fakemesh.default.init=1
 	uci commit fakemesh
