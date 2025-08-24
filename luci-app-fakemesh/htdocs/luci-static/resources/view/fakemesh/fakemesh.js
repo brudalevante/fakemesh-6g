@@ -40,10 +40,9 @@ return view.extend({
 		o.datatype = 'wpakey';
 
 		o = s.option(form.ListValue, 'band', _('Band'));
-		o.value('6g', _('6G'));
 		o.value('5g', _('5G'));
 		o.value('2g', _('2G'));
-		o.default = '6g';
+		o.default = '5g';
 
 		o = s.option(form.ListValue, 'role', _('Role'), _('Set the gateway router as controller, others as agent.'));
 		o.value('wap', _('Wired AP (ethernet as backhaul)'));
@@ -114,9 +113,7 @@ return view.extend({
 		if (current_role != 'controller') o.readonly = true;
 
 		o = s.option(form.ListValue, 'band', _('Band'));
-		o.value('2g5g6g', _('2G+5G+6G'));
 		o.value('2g5g', _('2G+5G'));
-		o.value('6g', _('6G'));
 		o.value('5g', _('5G'));
 		o.value('2g', _('2G'));
 		o.default = '2g5g';
