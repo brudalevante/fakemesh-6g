@@ -65,7 +65,6 @@ test $enabled -eq 0 && {
 
 	uci delete wireless.meshx0 &>/dev/null
 	uci delete wireless.meshx1 &>/dev/null
-	uci delete wireless.meshx2 &>/dev/null
 
 	I=0
 	while uci get wireless.@wifi-iface[$I] &>/dev/null; do
@@ -171,7 +170,7 @@ agent_lost_ac()
 	ssid="$(uci get base_config.@status[0].SSID)@$(uci get network.lan.ipaddr)"
 	ssid_passwd=$(uci get base_config.@status[0].SSID_PASSWD)
 	K=0
-	for band in 2g 5g 6g; do
+	for band in 2g 5g; do
 		wbandstr=$(uci show wireless | grep .band=\'${band}\'$ -m1)
 		if test -n "$wbandstr"; then
 			radio=$(echo $wbandstr | cut -d\. -f2)
@@ -213,7 +212,7 @@ agent_lost_ac()
 
 	#drop all in-comming DHCP request from eth port
 	for brif in $(cd /sys/class/net/br-lan/brif/ && ls); do
-		iwinfo $brif info &>/dev/null && [ "$brif" != "meshx0" ] && [ "$brif" != "meshx1" ] && [ "$brif" != "meshx2" ] && continue
+		iwinfo $brif info &>/dev/null && [ "$brif" != "meshx0" ] && [ "$brif" != "meshx1" ] && continue
 		nft_add_brmeshfilters $brif
 	done
 
@@ -231,7 +230,7 @@ agent_lost_ac()
 	#drop all in-comming DHCP request from eth port
 	#XXX: since network reload, netdevice may unregister and re-create, it is safe to re-add filter rules again.
 	for brif in $(cd /sys/class/net/br-lan/brif/ && ls); do
-		iwinfo $brif info &>/dev/null && [ "$brif" != "meshx0" ] && [ "$brif" != "meshx1" ] && [ "$brif" != "meshx2" ] && continue
+		iwinfo $brif info &>/dev/null && [ "$brif" != "meshx0" ] && [ "$brif" != "meshx1" ] && continue
 		nft_add_brmeshfilters $brif
 	done
 
@@ -291,7 +290,7 @@ agent_sync_config()
 				achost=$(for w in $achost; do echo $w; done | head -n$rand | tail -n1)
 				logger -t fakemesh "agent_sync_config($pid): umdns: achost found random select($achost)(lost_ac=$lost_ac)!"
 			fi
-		}
+		fi
 
 		hash=$(echo -n ${Xid}${Xkey} | md5sum | head -c32)
 		if ( \
@@ -350,12 +349,13 @@ agent_sync_config()
 			#delete old wifi config
 			I=0
 			while uci get wireless.@wifi-iface[$I] &>/dev/null; do
-				if uci show wireless.@wifi-iface[$I] | grep -q wireless.meshx[012]=wifi-iface; then
+				if uci show wireless.@wifi-iface[$I] | grep -q wireless.meshx[01]=wifi-iface; then
 					I=$((I+1))
 					continue
 				fi
 				uci delete wireless.@wifi-iface[$I] &>/dev/null
 			done
+
 			J=0
 			K=0
 			while uci get fakemeshac.@wifim[$J] &>/dev/null; do
@@ -365,10 +365,7 @@ agent_sync_config()
 				bands=$(uci get fakemeshac.@wifim[$J].band)
 				enabled=$(uci get fakemeshac.@wifim[$J].enabled || echo 1)
 
-				[ "$bands" = "2g5g6g" ] && bands="2g 5g 6g"
 				[ "$bands" = "2g5g" ] && bands="2g 5g"
-				[ "$bands" = "5g6g" ] && bands="5g 6g"
-				[ "$bands" = "2g6g" ] && bands="2g 6g"
 
 				[ "$enabled" = "1" ] && {
 					for band in $bands; do
@@ -525,10 +522,6 @@ agent_fix_channel()
 							uci set wireless.${radio}.htmode="VHT80"
 						elif [ "$htmode" = "HE160" ]; then
 							uci set wireless.${radio}.htmode="HE80"
-						elif [ "$htmode" = "EHT160" ]; then
-							uci set wireless.${radio}.htmode="EHT80"
-						elif [ "$htmode" = "EHT320" ]; then
-							uci set wireless.${radio}.htmode="EHT160"
 						fi
 					}
 					uci commit wireless
@@ -620,7 +613,7 @@ if [ "$role" = "controller" ]; then
 	if test -n "$wbandstr"; then
 		radio=$(echo $wbandstr | cut -d\. -f2) # radio0
 
-		#meshx0 (2GHz)
+		#meshx0
 		uci set wireless.meshx0=wifi-iface
 		uci set wireless.meshx0.device="${radio}"
 		uci set wireless.meshx0.network='lan'
@@ -638,229 +631,110 @@ if [ "$role" = "controller" ]; then
 			uci set wireless.meshx0.encryption='none'
 		fi
 		if [ "$fronthaul_disabled" = "1" ]; then
-			uci set wireless.meshx0.disabled='0'
+			uci set wireless.meshx0.disabled='1'
 		else
 			uci delete wireless.meshx0.disabled 2>/dev/null
 		fi
 
-		#meshx1 (5GHz)
+		#meshx1
 		uci delete wireless.meshx1 &>/dev/null
-		
-		#meshx2 (6GHz)
-		uci delete wireless.meshx2 &>/dev/null
 	fi
 
 	uci delete dhcp.meshx0 &>/dev/null
 	uci delete network.meshx0 &>/dev/null
 	uci delete network.meshx0_6 &>/dev/null
-	uci delete firewall.fakemesh &>/dev/null
-	sed -i "/.* controller.fakemesh/d" /etc/hosts
-	sed -i "/sh \/usr\/share\/fakemesh\/firewall.include.*/d" /etc/firewall.include
 
-	#disable lan
-	uci set network.lan.auto='0'
-	#disable wan
-	uci set network.wan.auto='0'
-	uci set network.wan6.auto='0'
-	#add wan port to br-lan
+	#re-enable lan
+	uci delete network.lan.auto &>/dev/null
+	#re-enable wan
+	uci delete network.wan.auto &>/dev/null
+	uci delete network.wan6.auto &>/dev/null
+	#del wan port from br-lan
 	lan_idx=0
 	while uci get network.@device[$lan_idx] &>/dev/null && [ $(uci get network.@device[$lan_idx].name) != "br-lan" ]; do lan_idx=$((lan_idx+1)); done
 	lan_ports="$(uci get network.@device[$lan_idx].ports 2>/dev/null)"
 	wan_port="$(uci get network.wan.device 2>/dev/null)"
-	echo "$lan_ports" | grep -q "$wan_port" || {
-		uci add_list network.@device[$lan_idx].ports="$wan_port"
+	newlan_ports=$(for lp in $lan_ports; do [ "$lp" = "$wan_port" ] || echo $lp; done | sort | uniq)
+	newlan_ports=$(echo $newlan_ports)
+	[ "$lan_ports" != "$newlan_ports" ] && {
+		uci delete network.@device[$lan_idx].ports &>/dev/null
+		for lp in $newlan_ports; do
+			uci add_list network.@device[$lan_idx].ports="$lp"
+		done
 	}
 
-	#add meshx0 to lan zone
+	#delete meshx0 from lan zone
 	lan_idx=0
 	while uci get firewall.@zone[$lan_idx] &>/dev/null && [ $(uci get firewall.@zone[$lan_idx].name) != "lan" ]; do lan_idx=$((lan_idx+1)); done
 	lan_net="$(uci get firewall.@zone[$lan_idx].network 2>/dev/null)"
-	echo "$lan_net" | grep -q "meshx0" || {
-		uci add_list firewall.@zone[$lan_idx].network="meshx0"
+	newlan_net=$(for ln in $lan_net; do [ "$ln" = "meshx0" -o "$ln" = "meshx0_6" ] || echo $ln; done | sort | uniq)
+	newlan_net=$(echo $newlan_net)
+	[ "$lan_net" != "$newlan_net" ] && {
+		uci delete firewall.@zone[$lan_idx].network &>/dev/null
+		for ln in $newlan_net; do
+			uci add_list firewall.@zone[$lan_idx].network="$ln"
+		done
+		uci commit firewall
 	}
 
-	#setup meshx0
-	uci set network.meshx0=interface
-	uci set network.meshx0.proto='static'
-	uci set network.meshx0.ipaddr="${access_ip}"
-	uci set network.meshx0.netmask='255.255.255.0'
-	uci set network.meshx0.auto='1'
+	# reload firewall
+	uci delete firewall.fakemesh &>/dev/null && uci commit firewall
 
-	#setup meshx0_6 for ipv6
-	uci set network.meshx0_6=interface
-	uci set network.meshx0_6.proto='dhcpv6'
-	uci set network.meshx0_6.reqaddress='try'
-	uci set network.meshx0_6.reqprefix='auto'
-	uci set network.meshx0_6.ifname='meshx0'
-	uci set network.meshx0_6.auto='1'
+	mkdir -p /usr/share/fakemesh
+	cat >/tmp/fakemesh.firewall.include <<-EOT
+#!/bin/sh
+iptables -t nat -C prerouting_lan_rule -d $access_ip/32 -p tcp --dport 80 -j REDIRECT --to-ports 80 2>/dev/null || \
+iptables -t nat -A prerouting_lan_rule -d $access_ip/32 -p tcp --dport 80 -j REDIRECT --to-ports 80 2>/dev/null
+iptables -t nat -C prerouting_lan_rule -d $access_ip/32 -p tcp --dport 443 -j REDIRECT --to-ports 443 2>/dev/null || \
+iptables -t nat -A prerouting_lan_rule -d $access_ip/32 -p tcp --dport 443 -j REDIRECT --to-ports 443 2>/dev/null
 
-	#setup dhcp for meshx0
-	uci set dhcp.meshx0=dhcp
-	uci set dhcp.meshx0.interface='meshx0'
-	uci set dhcp.meshx0.start='100'
-	uci set dhcp.meshx0.limit='150'
-	uci set dhcp.meshx0.leasetime='12h'
-	uci set dhcp.meshx0.dhcpv6='server'
-	uci set dhcp.meshx0.ra='server'
-	uci set dhcp.meshx0.ra_management='1'
-	uci set dhcp.meshx0.ra_default='1'
+nft -a list chain inet fw4 dstnat 2>/dev/null | grep -o "fakemesh.*" | while read _ _ _ handle; do nft delete rule inet fw4 dstnat handle \$handle; done
+nft insert rule inet fw4 dstnat iifname { \$(echo \$(fw4 -q zone lan | grep -v '*' | sort | uniq | sed 's/\(.*\)/"\1",/g') | sed 's/,$//') } ip daddr $access_ip/32 tcp dport 80 counter redirect to :80 comment "fakemesh" 2>/dev/null
+nft insert rule inet fw4 dstnat iifname { \$(echo \$(fw4 -q zone lan | grep -v '*' | sort | uniq | sed 's/\(.*\)/"\1",/g') | sed 's/,$//') } ip daddr $access_ip/32 tcp dport 443 counter redirect to :443 comment "fakemesh" 2>/dev/null
 
-	#setup firewall for meshx0
-	uci set firewall.fakemesh=rule
-	uci set firewall.fakemesh.name='Allow-Fakemesh'
-	uci set firewall.fakemesh.src='meshx0'
-	uci set firewall.fakemesh.dest_port='65535'
-	uci set firewall.fakemesh.proto='tcp'
-	uci set firewall.fakemesh.target='ACCEPT'
+EOT
+	ln -s /tmp/fakemesh.firewall.include /usr/share/fakemesh/firewall.include 2>/dev/null
+	grep -q "^sh /usr/share/fakemesh/firewall.include" /etc/firewall.include || echo "sh /usr/share/fakemesh/firewall.include" >>/etc/firewall.include
 
-	#add controller.fakemesh to /etc/hosts
-	echo "${access_ip} controller.fakemesh" >>/etc/hosts
-
-	#add firewall.include
-	echo "sh /usr/share/fakemesh/firewall.include" >>/etc/firewall.include
-
-	#setup firewall.include
-	cat >/usr/share/fakemesh/firewall.include <<EOF
-# Allow meshx0 to access lan
-iptables -I forwarding_rule -i meshx0 -o br-lan -j ACCEPT
-iptables -I forwarding_rule -i br-lan -o meshx0 -j ACCEPT
-# Allow meshx0 to access wan
-iptables -I forwarding_rule -i meshx0 -o wan -j ACCEPT
-iptables -I forwarding_rule -i wan -o meshx0 -j ACCEPT
-EOF
-
-	#setup wifi para meshx1 (5GHz) y meshx2 (6GHz)
-	for band in 5g 6g; do
-		wbandstr=$(uci show wireless | grep .band=\'${band}\'$ -m1)
-		if test -n "$wbandstr"; then
-			radio=$(echo $wbandstr | cut -d\. -f2)
-			meshif="meshx1"
-			[ "$band" = "6g" ] && meshif="meshx2"
-			
-			uci set wireless.$meshif=wifi-iface
-			uci set wireless.$meshif.device="${radio}"
-			uci set wireless.$meshif.network='lan'
-			uci set wireless.$meshif.ifname="$meshif"
-			uci set wireless.$meshif.mode='ap'
-			uci set wireless.$meshif.wds='1'
-			uci set wireless.$meshif.ssid="${Xid}"
-			uci set wireless.$meshif.hidden='1'
-			uci set wireless.$meshif.wpa_group_rekey='601'
-			uci set wireless.$meshif.max_inactivity='301'
-			if test -n "${Xkey}"; then
-				uci set wireless.$meshif.encryption='psk2'
-				uci set wireless.$meshif.key="${Xkey}"
-			else
-				uci set wireless.$meshif.encryption='none'
-			fi
-			if [ "$fronthaul_disabled" = "1" ]; then
-				uci set wireless.$meshif.disabled='0'
-			else
-				uci delete wireless.$meshif.disabled 2>/dev/null
-			fi
-		fi
-	done
-	#setup wifi for meshx0 (2GHz) - already done above
-
-	#setup wifi for meshx1 (5GHz) STA
-	wbandstr=$(uci show wireless | grep .band=\'5g\'$ -m1)
-	if test -n "$wbandstr"; then
-		radio=$(echo $wbandstr | cut -d\. -f2)
-		uci set wireless.meshx1_sta=wifi-iface
-		uci set wireless.meshx1_sta.device="${radio}"
-		uci set wireless.meshx1_sta.network='meshx0'
-		uci set wireless.meshx1_sta.ifname='meshx1'
-		uci set wireless.meshx1_sta.mode='sta'
-		uci set wireless.meshx1_sta.wds='1'
-		uci set wireless.meshx1_sta.ssid="${Xid}"
-		uci set wireless.meshx1_sta.hidden='1'
-		uci set wireless.meshx1_sta.wpa_group_rekey='601'
-		uci set wireless.meshx1_sta.max_inactivity='301'
-		if test -n "${Xkey}"; then
-			uci set wireless.meshx1_sta.encryption='psk2'
-			uci set wireless.meshx1_sta.key="${Xkey}"
+	grep -q "^$access_ip controller.fakemesh ac.fakemesh" /etc/hosts || {
+		if grep -q ".* controller.fakemesh ac.fakemesh" /etc/hosts; then
+			sed -i "s/.* controller.fakemesh ac.fakemesh/$access_ip controller.fakemesh ac.fakemesh/" /etc/hosts
 		else
-			uci set wireless.meshx1_sta.encryption='none'
+			echo "$access_ip controller.fakemesh ac.fakemesh" >>/etc/hosts
 		fi
-		uci set wireless.meshx1_sta.disabled='0'
-	fi
+		/etc/init.d/dnsmasq reload
+	}
 
-	#setup wifi for meshx2 (6GHz) STA
-	wbandstr=$(uci show wireless | grep .band=\'6g\'$ -m1)
-	if test -n "$wbandstr"; then
-		radio=$(echo $wbandstr | cut -d\. -f2)
-		uci set wireless.meshx2_sta=wifi-iface
-		uci set wireless.meshx2_sta.device="${radio}"
-		uci set wireless.meshx2_sta.network='meshx0'
-		uci set wireless.meshx2_sta.ifname='meshx2'
-		uci set wireless.meshx2_sta.mode='sta'
-		uci set wireless.meshx2_sta.wds='1'
-		uci set wireless.meshx2_sta.ssid="${Xid}"
-		uci set wireless.meshx2_sta.hidden='1'
-		uci set wireless.meshx2_sta.wpa_group_rekey='601'
-		uci set wireless.meshx2_sta.max_inactivity='301'
-		if test -n "${Xkey}"; then
-			uci set wireless.meshx2_sta.encryption='psk2'
-			uci set wireless.meshx2_sta.key="${Xkey}"
-		else
-			uci set wireless.meshx2_sta.encryption='none'
-		fi
-		uci set wireless.meshx2_sta.disabled='0'
-	fi
-
-	#setup wifi for meshx0 (2GHz) STA
-	wbandstr=$(uci show wireless | grep .band=\'2g\'$ -m1)
-	if test -n "$wbandstr"; then
-		radio=$(echo $wbandstr | cut -d\. -f2)
-		uci set wireless.meshx0_sta=wifi-iface
-		uci set wireless.meshx0_sta.device="${radio}"
-		uci set wireless.meshx0_sta.network='meshx0'
-		uci set wireless.meshx0_sta.ifname='meshx0'
-		uci set wireless.meshx0_sta.mode='sta'
-		uci set wireless.meshx0_sta.wds='1'
-		uci set wireless.meshx0_sta.ssid="${Xid}"
-		uci set wireless.meshx0_sta.hidden='1'
-		uci set wireless.meshx0_sta.wpa_group_rekey='601'
-		uci set wireless.meshx0_sta.max_inactivity='301'
-		if test -n "${Xkey}"; then
-			uci set wireless.meshx0_sta.encryption='psk2'
-			uci set wireless.meshx0_sta.key="${Xkey}"
-		else
-			uci set wireless.meshx0_sta.encryption='none'
-		fi
-		uci set wireless.meshx0_sta.disabled='0'
-	fi
-
-	uci commit fakemesh
-	uci commit wireless
-	uci commit dhcp
-	uci commit firewall
-	uci commit network
-
-	/etc/init.d/network reload
-	/etc/init.d/dnsmasq reload
 	/etc/init.d/firewall reload &>/dev/null
 
 	exec /usr/sbin/fakemesh gen_config &
 
-elif [ "$role" = "agent" ] || [ "$role" = "wap" ]; then
+	uci changes
 
-	rm -rf /tmp/fakemesh_lck*
+	test $(uci changes 2>/dev/null | grep -v "='dhcp'\|='interface'\|='wifi-iface'" | wc -l) -le 0 && {
+		uci revert wireless
+		uci revert dhcp
+		uci revert network
+
+		exec /usr/sbin/fakemesh agent_sync_config &
+		exit 0
+	}
+
+	uci commit wireless
+	uci commit dhcp
+	uci commit network
+
+	(sleep 15
+	 /etc/init.d/network reload
+	 /etc/init.d/dnsmasq reload
+	 exec /usr/sbin/fakemesh agent_sync_config & )&
+else
+	rm -f /www/fakemesh.*
+	/etc/init.d/sta_disable enabled 2>/dev/null && /etc/init.d/sta_disable disable
 
 	test -e /etc/init.d/umdns && {
-	mkdir -p /etc/umdns
-	ln -s /tmp/fakemesh.umdns.json /etc/umdns 2>/dev/null
-	umdns_json="{
-	\"fakemesh\": {
-		\"service\": \"_fakemesh_${Xid}._tcp.local\",
-		\"port\": 65535,
-		\"txt\": [ \"id=${Xid}\" ]
-	}
-}"
-	[ "$(cat /tmp/fakemesh.umdns.json 2>/dev/null | md5sum | head -c32)" = "$(echo "$umdns_json" | md5sum | head -c32)" ] || {
-	echo "$umdns_json" >/tmp/fakemesh.umdns.json
+	rm /tmp/fakemesh.umdns.json 2>/dev/null && \
 	/etc/init.d/umdns restart
-	}
 	}
 
 	# wireless.radio0.band='2g'
@@ -868,7 +742,7 @@ elif [ "$role" = "agent" ] || [ "$role" = "wap" ]; then
 	if test -n "$wbandstr"; then
 		radio=$(echo $wbandstr | cut -d\. -f2) # radio0
 
-		#meshx0 (2GHz)
+		#meshx0
 		uci set wireless.meshx0=wifi-iface
 		uci set wireless.meshx0.device="${radio}"
 		uci set wireless.meshx0.network='meshx0'
@@ -885,226 +759,132 @@ elif [ "$role" = "agent" ] || [ "$role" = "wap" ]; then
 		else
 			uci set wireless.meshx0.encryption='none'
 		fi
-		if [ "$fronthaul_disabled" = "0" ]; then
-			uci set wireless.meshx0.disabled='0'
+		if [ "$fronthaul_disabled" = "1" ]; then
+			uci set wireless.meshx0.disabled='1'
 		else
 			uci delete wireless.meshx0.disabled 2>/dev/null
 		fi
 
-		#meshx1 (5GHz)
-		uci delete wireless.meshx1 &>/dev/null
-		
-		#meshx2 (6GHz)
-		uci delete wireless.meshx2 &>/dev/null
-	fi
-
-	#setup wifi for meshx1 (5GHz) STA
-	wbandstr=$(uci show wireless | grep .band=\'5g\'$ -m1)
-	if test -n "$wbandstr"; then
-		radio=$(echo $wbandstr | cut -d\. -f2)
-		uci set wireless.meshx1_sta=wifi-iface
-		uci set wireless.meshx1_sta.device="${radio}"
-		uci set wireless.meshx1_sta.network='meshx0'
-		uci set wireless.meshx1_sta.ifname='meshx1'
-		uci set wireless.meshx1_sta.mode='sta'
-		uci set wireless.meshx1_sta.wds='1'
-		uci set wireless.meshx1_sta.ssid="${Xid}"
-		uci set wireless.meshx1_sta.hidden='1'
-		uci set wireless.meshx1_sta.wpa_group_rekey='601'
-		uci set wireless.meshx1_sta.max_inactivity='301'
-		if test -n "${Xkey}"; then
-			uci set wireless.meshx1_sta.encryption='psk2'
-			uci set wireless.meshx1_sta.key="${Xkey}"
-		else
-			uci set wireless.meshx1_sta.encryption='none'
-		fi
-		uci delete wireless.meshx1_sta.disabled 2>/dev/null
-	fi
-
-	#setup wifi for meshx2 (6GHz) STA
-	wbandstr=$(uci show wireless | grep .band=\'6g\'$ -m1)
-	if test -n "$wbandstr"; then
-		radio=$(echo $wbandstr | cut -d\. -f2)
-		uci set wireless.meshx2_sta=wifi-iface
-		uci set wireless.meshx2_sta.device="${radio}"
-		uci set wireless.meshx2_sta.network='meshx0'
-		uci set wireless.meshx2_sta.ifname='meshx2'
-		uci set wireless.meshx2_sta.mode='sta'
-		uci set wireless.meshx2_sta.wds='1'
-		uci set wireless.meshx2_sta.ssid="${Xid}"
-		uci set wireless.meshx2_sta.hidden='1'
-		uci set wireless.meshx2_sta.wpa_group_rekey='601'
-		uci set wireless.meshx2_sta.max_inactivity='301'
-		if test -n "${Xkey}"; then
-			uci set wireless.meshx2_sta.encryption='psk2'
-			uci set wireless.meshx2_sta.key="${Xkey}"
-		else
-			uci set wireless.meshx2_sta.encryption='none'
-		fi
-		uci delete wireless.meshx2_sta.disabled 2>/dev/null
-	fi
-
-	#setup wifi for meshx0 (2GHz) STA
-	wbandstr=$(uci show wireless | grep .band=\'2g\'$ -m1)
-	if test -n "$wbandstr"; then
-		radio=$(echo $wbandstr | cut -d\. -f2)
-		uci set wireless.meshx0_sta=wifi-iface
-		uci set wireless.meshx0_sta.device="${radio}"
-		uci set wireless.meshx0_sta.network='meshx0'
-		uci set wireless.meshx0_sta.ifname='meshx0'
-		uci set wireless.meshx0_sta.mode='sta'
-		uci set wireless.meshx0_sta.wds='1'
-		uci set wireless.meshx0_sta.ssid="${Xid}"
-		uci set wireless.meshx0_sta.hidden='1'
-		uci set wireless.meshx0_sta.wpa_group_rekey='601'
-		uci set wireless.meshx0_sta.max_inactivity='301'
-		if test -n "${Xkey}"; then
-			uci set wireless.meshx0_sta.encryption='psk2'
-			uci set wireless.meshx0_sta.key="${Xkey}"
-		else
-			uci set wireless.meshx0_sta.encryption='none'
-		fi
-		uci delete wireless.meshx0_sta.disabled 2>/dev/null
-	fi
-
-	#setup wifi for meshx1 (5GHz) AP
-	wbandstr=$(uci show wireless | grep .band=\'5g\'$ -m1)
-	if test -n "$wbandstr"; then
-		radio=$(echo $wbandstr | cut -d\. -f2)
+		#meshx1
 		uci set wireless.meshx1=wifi-iface
 		uci set wireless.meshx1.device="${radio}"
 		uci set wireless.meshx1.network='meshx0'
 		uci set wireless.meshx1.ifname='meshx1'
-		uci set wireless.meshx1.mode='ap'
+		uci set wireless.meshx1.mode='sta'
 		uci set wireless.meshx1.wds='1'
 		uci set wireless.meshx1.ssid="${Xid}"
-		uci set wireless.meshx1.hidden='1'
-		uci set wireless.meshx1.wpa_group_rekey='601'
-		uci set wireless.meshx1.max_inactivity='301'
 		if test -n "${Xkey}"; then
 			uci set wireless.meshx1.encryption='psk2'
 			uci set wireless.meshx1.key="${Xkey}"
 		else
 			uci set wireless.meshx1.encryption='none'
 		fi
-		if [ "$fronthaul_disabled" = "0" ]; then
-			uci set wireless.meshx1.disabled='0'
+		if [ "$role" = "wap" ]; then
+			uci set wireless.meshx1.disabled='1'
 		else
 			uci delete wireless.meshx1.disabled 2>/dev/null
 		fi
-	fi
 
-	#setup wifi for meshx2 (6GHz) AP
-	wbandstr=$(uci show wireless | grep .band=\'6g\'$ -m1)
-	if test -n "$wbandstr"; then
-		radio=$(echo $wbandstr | cut -d\. -f2)
-		uci set wireless.meshx2=wifi-iface
-		uci set wireless.meshx2.device="${radio}"
-		uci set wireless.meshx2.network='meshx0'
-		uci set wireless.meshx2.ifname='meshx2'
-		uci set wireless.meshx2.mode='ap'
-		uci set wireless.meshx2.wds='1'
-		uci set wireless.meshx2.ssid="${Xid}"
-		uci set wireless.meshx2.hidden='1'
-		uci set wireless.meshx2.wpa_group_rekey='601'
-		uci set wireless.meshx2.max_inactivity='301'
-		if test -n "${Xkey}"; then
-			uci set wireless.meshx2.encryption='psk2'
-			uci set wireless.meshx2.key="${Xkey}"
-		else
-			uci set wireless.meshx2.encryption='none'
-		fi
-		if [ "$fronthaul_disabled" = "0" ]; then
-			uci set wireless.meshx2.disabled='0'
-		else
-			uci delete wireless.meshx2.disabled 2>/dev/null
+		if [ "$role" = "agent" ] && [ "$(uci get wireless.${radio}.channel 2>/dev/null || echo auto)" = "auto" ]; then
+			if [ "$band" = "5g" ]; then
+				uci set wireless.${radio}.channel='36'
+			else
+				uci set wireless.${radio}.channel='1'
+			fi
 		fi
 	fi
 
-	uci delete dhcp.meshx0 &>/dev/null
-	uci delete network.meshx0 &>/dev/null
-	uci delete network.meshx0_6 &>/dev/null
-	uci delete firewall.fakemesh &>/dev/null
-	sed -i "/.* controller.fakemesh/d" /etc/hosts
-	sed -i "/sh \/usr\/share\/fakemesh\/firewall.include.*/d" /etc/firewall.include
+	uci set dhcp.meshx0=dhcp
+	uci set dhcp.meshx0.ignore='1'
 
-	#disable lan
 	uci set network.lan.auto='0'
-	#disable wan
-	uci set network.wan.auto='0'
-	uci set network.wan6.auto='0'
-	#add wan port to br-lan
-	lan_idx=0
-	while uci get network.@device[$lan_idx] &>/dev/null && [ $(uci get network.@device[$lan_idx].name) != "br-lan" ]; do lan_idx=$((lan_idx+1)); done
-	lan_ports="$(uci get network.@device[$lan_idx].ports 2>/dev/null)"
-	wan_port="$(uci get network.wan.device 2>/dev/null)"
-	echo "$lan_ports" | grep -q "$wan_port" || {
-		uci add_list network.@device[$lan_idx].ports="$wan_port"
-	}
+
+	uci set network.meshx0=interface
+	uci set network.meshx0.device="$(uci get network.lan.device)"
+	uci set network.meshx0.proto='dhcp'
+	uci set network.meshx0.defaultroute='1'
+	uci set network.meshx0.metric='10'
+	uci set network.meshx0.hostname="MESH-AGENT_$(echo -n $MACADDR | sed 's/://g' | tr a-f A-F)"
+
+	uci set network.meshx0_6=interface
+	uci set network.meshx0_6.proto='dhcpv6'
+	uci set network.meshx0_6.device='@meshx0'
+	uci set network.meshx0_6.reqaddress='try'
+	uci set network.meshx0_6.reqprefix='auto'
+	uci set network.meshx0_6.delegate='0'
+	uci set network.meshx0_6.hostname="MESH-AGENT_$(echo -n $MACADDR | sed 's/://g' | tr a-f A-F)"
 
 	#add meshx0 to lan zone
 	lan_idx=0
 	while uci get firewall.@zone[$lan_idx] &>/dev/null && [ $(uci get firewall.@zone[$lan_idx].name) != "lan" ]; do lan_idx=$((lan_idx+1)); done
 	lan_net="$(uci get firewall.@zone[$lan_idx].network 2>/dev/null)"
-	echo "$lan_net" | grep -q "meshx0" || {
-		uci add_list firewall.@zone[$lan_idx].network="meshx0"
+	newlan_net=$(for ln in $lan_net meshx0 meshx0_6; do echo $ln; done | sort | uniq)
+	newlan_net=$(echo $newlan_net)
+	[ "$lan_net" != "$newlan_net" ] && {
+		uci delete firewall.@zone[$lan_idx].network &>/dev/null
+		for ln in $newlan_net; do
+			uci add_list firewall.@zone[$lan_idx].network="$ln"
+		done
+		uci commit firewall
 	}
 
-	#setup meshx0
-	uci set network.meshx0=interface
-	uci set network.meshx0.proto='dhcp'
-	uci set network.meshx0.ifname='meshx0'
-	uci set network.meshx0.auto='1'
+	#disable wan
+	uci set network.wan.auto='0' 2>/dev/null
+	uci set network.wan6.auto='0' 2>/dev/null
+	#add wan port to br-lan
+	lan_idx=0
+	while uci get network.@device[$lan_idx] &>/dev/null && [ $(uci get network.@device[$lan_idx].name) != "br-lan" ]; do lan_idx=$((lan_idx+1)); done
+	lan_ports="$(uci get network.@device[$lan_idx].ports 2>/dev/null)"
+	wan_port="$(uci get network.wan.device 2>/dev/null)"
+	newlan_ports=$(for lp in $lan_ports $wan_port; do echo $lp; done | sort | uniq)
+	newlan_ports=$(echo $newlan_ports)
+	[ "$lan_ports" != "$newlan_ports" ] && {
+		uci delete network.@device[$lan_idx].ports &>/dev/null
+		for lp in $newlan_ports; do
+			uci add_list network.@device[$lan_idx].ports="$lp"
+		done
+	}
 
-	#setup meshx0_6 for ipv6
-	uci set network.meshx0_6=interface
-	uci set network.meshx0_6.proto='dhcpv6'
-	uci set network.meshx0_6.reqaddress='try'
-	uci set network.meshx0_6.reqprefix='auto'
-	uci set network.meshx0_6.ifname='meshx0'
-	uci set network.meshx0_6.auto='1'
+	# reload firewall
+	uci delete firewall.fakemesh &>/dev/null && uci commit firewall
 
-	#setup dhcp for meshx0
-	uci set dhcp.meshx0=dhcp
-	uci set dhcp.meshx0.interface='meshx0'
-	uci set dhcp.meshx0.ignore='1'
+	mkdir -p /usr/share/fakemesh
+	cat >/tmp/fakemesh.firewall.include <<-EOT
+#!/bin/sh
+iptables -t filter -C output_lan_rule -j MARK --set-xmark 0x00010000/0x00010000 2>/dev/null || \
+iptables -t filter -A output_lan_rule -j MARK --set-xmark 0x00010000/0x00010000 2>/dev/null
+iptables -t nat -C zone_lan_postrouting -m mark --mark 0x00010000/0x00010000 -j MASQUERADE 2>/dev/null || \
+iptables -t nat -A zone_lan_postrouting -m mark --mark 0x00010000/0x00010000 -j MASQUERADE 2>/dev/null
 
-	#setup firewall for meshx0
-	uci set firewall.fakemesh=rule
-	uci set firewall.fakemesh.name='Allow-Fakemesh'
-	uci set firewall.fakemesh.src='meshx0'
-	uci set firewall.fakemesh.dest_port='65535'
-	uci set firewall.fakemesh.proto='tcp'
-	uci set firewall.fakemesh.target='ACCEPT'
+nft -a list chain inet fw4 output_lan 2>/dev/null | grep -o "fakemesh_mark_0x10000.*" | while read _ _ _ handle; do nft delete rule inet fw4 output_lan handle \$handle; done
+nft insert rule inet fw4 output_lan counter meta mark set mark or 0x10000 comment "fakemesh_mark_0x10000" 2>/dev/null
 
-	#add controller.fakemesh to /etc/hosts
-	echo "${access_ip} controller.fakemesh" >>/etc/hosts
+nft -a list chain inet fw4 srcnat 2>/dev/null | grep -o "fakemesh_mark_0x10000.*" | while read _ _ _ handle; do nft delete rule inet fw4 srcnat handle \$handle; done
+nft insert rule inet fw4 srcnat oifname { \$(echo \$(fw4 -q zone lan | grep -v '*' | sort | uniq | sed 's/\(.*\)/"\1",/g') | sed 's/,$//') } mark and 0x10000 == 0x10000 counter masquerade comment "fakemesh_mark_0x10000" 2>/dev/null
+EOT
+	ln -s /tmp/fakemesh.firewall.include /usr/share/fakemesh/firewall.include 2>/dev/null
+	grep -q "^sh /usr/share/fakemesh/firewall.include" /etc/firewall.include || echo "sh /usr/share/fakemesh/firewall.include" >>/etc/firewall.include
 
-	#add firewall.include
-	echo "sh /usr/share/fakemesh/firewall.include" >>/etc/firewall.include
-
-	#setup firewall.include
-	cat >/usr/share/fakemesh/firewall.include <<EOF
-# Allow meshx0 to access lan
-iptables -I forwarding_rule -i meshx0 -o br-lan -j ACCEPT
-iptables -I forwarding_rule -i br-lan -o meshx0 -j ACCEPT
-# Allow meshx0 to access wan
-iptables -I forwarding_rule -i meshx0 -o wan -j ACCEPT
-iptables -I forwarding_rule -i wan -o meshx0 -j ACCEPT
-EOF
-
-	uci commit fakemesh
-	uci commit wireless
-	uci commit dhcp
-	uci commit firewall
-	uci commit network
-
-	/etc/init.d/network reload
-	/etc/init.d/dnsmasq reload
 	/etc/init.d/firewall reload &>/dev/null
 
-	exec /usr/sbin/fakemesh agent_sync_config &
-	exec /usr/sbin/fakemesh agent_fix_channel &
-fi
+	uci changes
 
-exit 0
+	test $(uci changes 2>/dev/null | grep -v "='dhcp'\|='interface'\|='wifi-iface'" | wc -l) -le 0 && {
+		uci revert wireless
+		uci revert dhcp
+		uci revert network
+
+		exec /usr/sbin/fakemesh agent_fix_channel &
+		exit 0
+	}
+
+	uci commit wireless
+	uci commit dhcp
+	uci commit network
+	sed -i "/.* controller.fakemesh/d" /etc/hosts
+
+	(sleep 15
+	 /etc/init.d/network reload
+	 /etc/init.d/dnsmasq reload
+	 exec /usr/sbin/fakemesh agent_fix_channel & )&
+fi
