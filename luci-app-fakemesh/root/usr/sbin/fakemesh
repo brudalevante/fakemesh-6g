@@ -200,7 +200,7 @@ agent_lost_ac()
 		fi
 	done
 	while uci get wireless.wifinet$K 2>/dev/null; do
-		uci set wireless.wifinet$K.disabled='0'
+		uci set wireless.wifinet$K.disabled='1'
 		K=$((K+1))
 	done
 
@@ -291,7 +291,7 @@ agent_sync_config()
 				achost=$(for w in $achost; do echo $w; done | head -n$rand | tail -n1)
 				logger -t fakemesh "agent_sync_config($pid): umdns: achost found random select($achost)(lost_ac=$lost_ac)!"
 			fi
-		fi
+		}
 
 		hash=$(echo -n ${Xid}${Xkey} | md5sum | head -c32)
 		if ( \
@@ -356,7 +356,6 @@ agent_sync_config()
 				fi
 				uci delete wireless.@wifi-iface[$I] &>/dev/null
 			done
-
 			J=0
 			K=0
 			while uci get fakemeshac.@wifim[$J] &>/dev/null; do
@@ -471,7 +470,7 @@ agent_keep_alive()
 	logger -t fakemesh "agent_keep_alive($pid): started!"
 	while :; do
 		sleep 10
-		sta="$(ubus -S list wpa_supplicant.meshx1)" # 5GHz STA
+		sta="$(ubus -S list wpa_supplicant.meshx1)"
 		if test -n "$sta"; then
 			if [ $(iwinfo meshx1 info | grep -c 'ESSID: unknown') -ge 1 ]; then
 				sta_lost=$((sta_lost+1))
@@ -513,7 +512,7 @@ agent_fix_channel()
 	logger -t fakemesh "agent_fix_channel($pid): started!"
 	while :; do
 		sleep 10
-		sta="$(ubus -S list wpa_supplicant.meshx1)" # 5GHz STA
+		sta="$(ubus -S list wpa_supplicant.meshx1)"
 		if test -n "$sta"; then
 			chan=$(iwinfo meshx1 scan | grep -A1 -B1 "ESSID: \"${Xid}\"" | head -n3 | tail -n1 | grep -io "Channel:.*"| awk '{print $2}')
 			if test -n "$chan"; then
@@ -730,7 +729,7 @@ iptables -I forwarding_rule -i meshx0 -o wan -j ACCEPT
 iptables -I forwarding_rule -i wan -o meshx0 -j ACCEPT
 EOF
 
-	#setup wifi for meshx1 (5GHz) and meshx2 (6GHz)
+	#setup wifi para meshx1 (5GHz) y meshx2 (6GHz)
 	for band in 5g 6g; do
 		wbandstr=$(uci show wireless | grep .band=\'${band}\'$ -m1)
 		if test -n "$wbandstr"; then
@@ -761,7 +760,6 @@ EOF
 			fi
 		fi
 	done
-
 	#setup wifi for meshx0 (2GHz) - already done above
 
 	#setup wifi for meshx1 (5GHz) STA
