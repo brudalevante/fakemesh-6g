@@ -40,6 +40,7 @@ return view.extend({
 		o.datatype = 'wpakey';
 
 		o = s.option(form.ListValue, 'band', _('Band'));
+		o.value('6g', _('6G'));
 		o.value('5g', _('5G'));
 		o.value('2g', _('2G'));
 		o.default = '5g';
@@ -115,8 +116,9 @@ return view.extend({
 		o = s.option(form.ListValue, 'band', _('Band'));
 		o.value('5g6g', _('5G+6G'));
 		o.value('6g', _('6G'));
-		o.value('5', _('5G'));
-		o.default = '5g6g';
+		o.value('5g', _('5G'));
+		o.value('2g', _('2G'));
+		o.default = '2g5g6g';
 		if (current_role != 'controller') o.readonly = true;
 
 		o = s.option(form.Flag, 'enabled', _('Enable'));
